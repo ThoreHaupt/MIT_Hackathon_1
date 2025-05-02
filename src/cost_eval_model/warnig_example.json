@@ -1,0 +1,324 @@
+{
+  "warning": [
+    {
+      "identifier": "undefined--vi-hind.2025-05-02_21-46-00-000.f_007.de0",
+      "icon": "101",
+      "isBlocked": "false",
+      "future": false,
+      "extent": "51.38359891748761,7.437438907153718,51.38625408373312,7.438717886623495",
+      "point": "51.38359891748761,7.437438907153718",
+      "startLcPosition": "95",
+      "display_type": "WARNING",
+      "subtitle": " Köln -> Dortmund",
+      "title": "A1 | Funckenhausen - Vorhalle",
+      "startTimestamp": "2025-05-02T21:46:00+02:00",
+      "coordinate": {
+        "lat": 51.38359891748761,
+        "long": 7.437438907153718
+      },
+      "description": [
+        "Beginn: 02.05.25 um 21:46 Uhr",
+        "",
+        "Hindernis, seit 02.05.2025, 21:46",
+        "A1: Köln -> Dortmund, zwischen 1.6 km hinter Funckenhausen und 0.3 km vor Vorhalle",
+        "",
+        "Gefahr durch Personen auf der Fahrbahn",
+        "",
+        "Gefahr durch Gegenstände auf der Fahrbahn"
+      ],
+      "routeRecommendation": [],
+      "footer": [],
+      "lorryParkingFeatureIcons": [],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            7.437438907,
+            51.383598917
+          ],
+          [
+            7.4374679,
+            51.383658601
+          ],
+          [
+            7.4376193,
+            51.383970101
+          ],
+          [
+            7.4378787,
+            51.384504101
+          ],
+          [
+            7.4380096,
+            51.384779801
+          ],
+          [
+            7.4382273,
+            51.385232901
+          ],
+          [
+            7.4384335,
+            51.385659801
+          ],
+          [
+            7.438717887,
+            51.386254084
+          ]
+        ]
+      }
+    },
+    {
+      "identifier": "undefined--vi-hind.2025-05-02_21-46-00-000.f_006.de0",
+      "icon": "101",
+      "isBlocked": "false",
+      "future": false,
+      "extent": "51.38645038430552,7.438556642044017,51.38367790746007,7.437220278145675",
+      "point": "51.38645038430552,7.438556642044017",
+      "startLcPosition": "97",
+      "display_type": "WARNING",
+      "subtitle": " Dortmund -> Köln",
+      "title": "A1 | Vorhalle - Funckenhausen",
+      "startTimestamp": "2025-05-02T21:46:00+02:00",
+      "coordinate": {
+        "lat": 51.38645038430552,
+        "long": 7.438556642044017
+      },
+      "description": [
+        "Beginn: 02.05.25 um 21:46 Uhr",
+        "",
+        "Hindernis, seit 02.05.2025, 21:46",
+        "A1: Dortmund -> Köln, zwischen 0.3 km hinter Vorhalle und 1.6 km vor Funckenhausen",
+        "",
+        "Gefahr durch Personen auf der Fahrbahn"
+      ],
+      "routeRecommendation": [],
+      "footer": [],
+      "lorryParkingFeatureIcons": [],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            7.438556642,
+            51.386450384
+          ],
+          [
+            7.4384924,
+            51.386317801
+          ],
+          [
+            7.437635,
+            51.384538701
+          ],
+          [
+            7.4372323,
+            51.383702501
+          ],
+          [
+            7.437220278,
+            51.383677907
+          ]
+        ]
+      }
+    },
+    {
+      "identifier": "undefined--vi-hind.2025-05-02_22-10-00-000.f_001.de0",
+      "icon": "101",
+      "isBlocked": "false",
+      "future": false,
+      "extent": "51.57353330093298,7.669133699999271,51.594503624699165,7.6857607788407485",
+      "point": "51.57353330093298,7.669133699999271",
+      "startLcPosition": "104",
+      "display_type": "WARNING",
+      "subtitle": " Dortmund -> Münster",
+      "title": "A1 | Unna - Kamener Kreuz",
+      "startTimestamp": "2025-05-02T22:10:00+02:00",
+      "coordinate": {
+        "lat": 51.57353330093298,
+        "long": 7.669133699999271
+      },
+      "description": [
+        "Beginn: 02.05.25 um 22:10 Uhr",
+        "",
+        "Fahrzeug-Hindernis, seit 02.05.2025, 22:10",
+        "A1: Dortmund -> Münster, zwischen 5.3 km hinter AS Unna und 0.7 km vor AK Kamener Kreuz",
+        "Gefahr durch ein defektes Fahrzeug auf der Fahrbahn"
+      ],
+      "routeRecommendation": [],
+      "footer": [],
+      "lorryParkingFeatureIcons": [],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            7.6691337,
+            51.573533301
+          ],
+          [
+            7.6697202,
+            51.574302401
+          ],
+          [
+            7.6704364,
+            51.575110301
+          ],
+          [
+            7.6707057,
+            51.575406701
+          ],
+          [
+            7.6716793,
+            51.576454801
+          ],
+          [
+            7.6727236,
+            51.577465301
+          ],
+          [
+            7.6732888,
+            51.577962901
+          ],
+          [
+            7.6740509,
+            51.578605601
+          ],
+          [
+            7.6751136,
+            51.579447201
+          ],
+          [
+            7.6758774,
+            51.580017501
+          ],
+          [
+            7.6761592,
+            51.580245401
+          ],
+          [
+            7.6766313,
+            51.580599001
+          ],
+          [
+            7.6773948,
+            51.581217701
+          ],
+          [
+            7.6782176,
+            51.581953201
+          ],
+          [
+            7.6784956,
+            51.582219401
+          ],
+          [
+            7.6796601,
+            51.583460501
+          ],
+          [
+            7.6806104,
+            51.584567001
+          ],
+          [
+            7.6816004,
+            51.585765001
+          ],
+          [
+            7.6820018,
+            51.586263101
+          ],
+          [
+            7.6826506,
+            51.587096901
+          ],
+          [
+            7.6831093,
+            51.587702201
+          ],
+          [
+            7.6836414,
+            51.588477201
+          ],
+          [
+            7.6840631,
+            51.589213401
+          ],
+          [
+            7.6843965,
+            51.589906701
+          ],
+          [
+            7.6845117,
+            51.590164101
+          ],
+          [
+            7.6847788,
+            51.590829001
+          ],
+          [
+            7.6849377,
+            51.591342501
+          ],
+          [
+            7.6855639,
+            51.593730801
+          ],
+          [
+            7.6857354,
+            51.594396901
+          ],
+          [
+            7.685760779,
+            51.594503625
+          ]
+        ]
+      }
+    },
+    {
+      "identifier": "undefined--vi-hind.2025-05-02_21-58-30-000.f_002.de0",
+      "icon": "101",
+      "isBlocked": "false",
+      "future": false,
+      "extent": "51.60131410661492,7.6874286769337985,51.603006523977655,7.687846325301754",
+      "point": "51.60131410661492,7.6874286769337985",
+      "startLcPosition": "106",
+      "display_type": "WARNING",
+      "subtitle": " Dortmund -> Münster",
+      "title": "A1 | Kamener Kreuz - Overberger Busch",
+      "startTimestamp": "2025-05-02T21:58:30+02:00",
+      "coordinate": {
+        "lat": 51.60131410661492,
+        "long": 7.6874286769337985
+      },
+      "description": [
+        "Beginn: 02.05.25 um 21:58 Uhr",
+        "",
+        "Fahrzeug-Hindernis, seit 02.05.2025, 21:58",
+        "A1: Dortmund -> Münster, zwischen AK Kamener Kreuz und 1.8 km vor Overberger Busch",
+        "Gefahr durch ein defektes Fahrzeug auf der Fahrbahn"
+      ],
+      "routeRecommendation": [],
+      "footer": [],
+      "lorryParkingFeatureIcons": [],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            7.687428677,
+            51.601314107
+          ],
+          [
+            7.6875817,
+            51.601952501
+          ],
+          [
+            7.6878327,
+            51.602935101
+          ],
+          [
+            7.687846325,
+            51.603006524
+          ]
+        ]
+      }
+    }
+  ]
+}
