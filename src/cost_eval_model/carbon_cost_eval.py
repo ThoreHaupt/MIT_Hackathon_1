@@ -1,4 +1,5 @@
 from cost_model import CostModel
+from cost_eval_model.params import *
 
 
 class CarbonCostModel(CostModel):

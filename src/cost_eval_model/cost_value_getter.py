@@ -1,3 +1,4 @@
+from cost_eval_model.params import *
 
 class CostEvaluator:
     
@@ -17,19 +18,6 @@ class CostEvaluator:
 
 
         self.scraper_api = None
-
-    def time_cost(self, distance:float, transport_type:str, weather:str, max_speed:float):
-        """
-        Calculate the time per km for each transport type.
-        """
-        cost_dict = {
-            "train": 1 / self.max_speed_train,
-            "ship": 1 / self.max_speed_ship,
-            "road": 1 / self.max_speed_highway,
-            "air": 1 / self.max_speed_air
-        }
-
-        return cost_dict[transport_type] * distance
     
     def carbon_cost(self, distance:float, transport_type:str, weather:str):
         """

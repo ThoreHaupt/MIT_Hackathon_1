@@ -1,7 +1,7 @@
-from 
+from cost_eval_model.params import *
+from cost_eval_model.cost_model import CostModel
 
-
-class RiskCostModel:
+class RiskCostModel(CostModel):
     """
     This class is used to evaluate the risk cost of a given model.
     """
