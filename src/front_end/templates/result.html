@@ -25,20 +25,33 @@
     <a href="/">Plan Another</a>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        const origin = {{ route.origin_coords | tojson }};
-        const destination = {{ route.destination_coords | tojson }};
 
-        const map = L.map('map').setView(origin, 5);
+    <script>
+        const segments = {{ route.segments | tojson }};
+        const modeColors = {
+            "Truck": "blue",
+            "Train": "green",
+            "Ship": "navy",
+            "Air": "red"
+        };
+
+        const map = L.map('map').setView(segments[0].path[0], 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        L.marker(origin).addTo(map).bindPopup("Origin").openPopup();
-        L.marker(destination).addTo(map).bindPopup("Destination");
+        // Draw each segment with color by mode
+        segments.forEach(segment => {
+            const color = modeColors[segment.mode] || 'gray';
+            L.polyline(segment.path, { color: color, weight: 5 }).addTo(map)
+                .bindPopup(`Mode: ${segment.mode}`);
+        });
 
-        L.polyline([origin, destination], { color: 'blue' }).addTo(map);
+        // Add markers at start and end
+        L.marker(segments[0].path[0]).addTo(map).bindPopup("Origin").openPopup();
+        L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
     </script>
+
 </body>
 </html>
