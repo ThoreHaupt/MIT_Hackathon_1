@@ -6,15 +6,13 @@ def plan_route(origin, destination, mode):
         "Los Angeles": [34.0522, -118.2437],
     }
 
-    origin_coords = coords.get(origin, [40.0, -75.0])
     mid_coords = coords.get("Chicago", [41.8, -87.6])
-    destination_coords = coords.get(destination, [35.0, -90.0])
 
     # Simulated multimodal route: Truck to Chicago, Train to LA
     return {
         "steps": [
-            f"Truck from {origin} to Chicago",
-            f"Train from Chicago to {destination}"
+            f"Truck from {origin["name"]} to Chicago",
+            f"Train from Chicago to {destination["name"]}"
         ],
         "duration": "12 hours",
         "cost_estimate": "$1,800",
@@ -22,11 +20,11 @@ def plan_route(origin, destination, mode):
         "segments": [
             {
                 "mode": "Truck",
-                "path": [origin_coords, mid_coords]
+                "path": [origin["coords"], mid_coords]
             },
             {
                 "mode": "Train",
-                "path": [mid_coords, destination_coords]
+                "path": [mid_coords, destination["coords"]]
             }
         ]
     }
