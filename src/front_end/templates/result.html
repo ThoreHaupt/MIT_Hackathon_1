@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Results</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Route from {{ origin }} to {{ destination }} via {{ mode }}</h2>
+
+    <ul>
+        {% for step in route.steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+    </ul>
+
+    <p>Estimated Time: {{ route.duration }}</p>
+    <p>Estimated Cost: {{ route.cost_estimate }}</p>
+
+    <div id="map"></div>
+
+    <a href="/">Plan Another</a>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const origin = {{ route.origin_coords | tojson }};
+        const destination = {{ route.destination_coords | tojson }};
+
+        const map = L.map('map').setView(origin, 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker(origin).addTo(map).bindPopup("Origin").openPopup();
+        L.marker(destination).addTo(map).bindPopup("Destination");
+
+        L.polyline([origin, destination], { color: 'blue' }).addTo(map);
+    </script>
+</body>
+</html>
