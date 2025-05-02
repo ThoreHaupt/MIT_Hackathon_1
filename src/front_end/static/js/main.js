@@ -5,18 +5,35 @@ let routeLine;
 
 // Initialize the map
 function initMap() {
-    // Create the map centered on a default location
-    map = L.map('map').setView([0, 0], 2);
+    // Wait for the map container to be available
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+        console.error('Map container not found');
+        return;
+    }
 
-    // Add the OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    try {
+        // Create the map centered on a default location
+        map = L.map('map').setView([0, 0], 2);
+
+        // Add the OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        console.log('Map initialized successfully');
+    } catch (error) {
+        console.error('Error initializing map:', error);
+    }
 }
 
-// Initialize the map when the page loads
-document.addEventListener('DOMContentLoaded', initMap);
+// Make sure the DOM is fully loaded before initializing
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMap);
+} else {
+    initMap();
+}
 
 // Handle form submission
 document.getElementById('transportForm').addEventListener('submit', function(e) {
