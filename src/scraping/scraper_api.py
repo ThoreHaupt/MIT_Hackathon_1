@@ -1,5 +1,7 @@
 import datetime
 import WetterEnum
+from src.scraping.traffic_data.traffic_issues import traffic_issues
+
 
 def get_ship_data(locationStart, locationTaget):
     return {
@@ -42,4 +44,10 @@ def train_available(locationStart, locationTaget):
 
 def flight_available(locationStart, locationTaget):
     return True
+
+def get_traffic_issues():
+    return traffic_issues()
+
+def get_construction_data():
+    return get_construction_data()
 
