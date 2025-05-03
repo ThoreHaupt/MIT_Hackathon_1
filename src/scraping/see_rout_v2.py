@@ -1,149 +1,135 @@
-import numpy as np
-from geographiclib.geodesic import Geodesic
 import geopandas as gpd
-from shapely.geometry import Point
-from collections import deque
+import networkx as nx
+from shapely.geometry import Point, box
+from geopy.distance import geodesic
+import math
+import numpy as np
+from itertools import product
 
-# Load higher resolution data (download from Natural Earth)
-land = gpd.read_file('ne_10m_land/ne_10m_land.shp')
-ocean = gpd.read_file('ne_10m_ocean/ne_10m_ocean.shp')
-
-# Configuration
-GRID_RESOLUTION = 0.1  # Degrees (~11 km at equator)
-MAX_SEARCH_DISTANCE = 5  # Grid cells to search
-
-
-def is_in_water(lon, lat):
-    point = Point(lon, lat)
-    return ocean.geometry.contains(point).any()
+# Load land polygon dataset (Natural Earth's coastline) - load once globally
+LAND = gpd.read_file("ne_10m_land/ne_10m_land.shp")
 
 
-def create_maritime_grid(start, end):
-    """Create a navigable grid around the route"""
-    geod = Geodesic.WGS84
-    bearing = geod.Inverse(*start, *end)['azi1']
+def is_water(lat, lon, grid_size=0.05, num_samples=9, threshold=0.5):
+    """
+    Optimized water detection using spatial indexing and vectorized operations.
 
-    # Create grid bounds with buffer
-    min_lon = min(start[0], end[0]) - 2
-    max_lon = max(start[0], end[0]) + 2
-    min_lat = min(start[1], end[1]) - 2
-    max_lat = max(start[1], end[1]) + 2
+    Parameters:
+    - lat, lon: Point coordinates
+    - grid_size: Distance between sampling points (in degrees)
+    - num_samples: Number of surrounding points to test
+    - threshold: Minimum percentage of water required to consider it water
+    """
+    # Generate sample points in a single operation
+    offsets = np.linspace(-grid_size, grid_size, int(math.sqrt(num_samples)))
+    lats = lat + offsets
+    lons = lon + offsets
 
-    # Generate grid points
-    lons = np.arange(min_lon, max_lon, GRID_RESOLUTION)
-    lats = np.arange(min_lat, max_lat, GRID_RESOLUTION)
+    # Create all combinations of lat/lon
+    points = [Point(lon, lat) for lat, lon in product(lats, lons)]
 
-    grid = {}
-    for lon in lons:
-        for lat in lats:
-            grid[(lon, lat)] = is_in_water(lon, lat)
+    # Vectorized check using spatial index
+    results = ~LAND.geometry.unary_union.intersects(Point(lon, lat))
 
-    return grid
+    # If center point is water, assume it's water (faster for open ocean)
+    if results:
+        return True
 
-
-def bfs_maritime_route(start, end, grid):
-    """Find path using breadth-first search"""
-    geod = Geodesic.WGS84
-    queue = deque()
-    queue.append(start)
-    visited = {start: None}
-
-    while queue:
-        current = queue.popleft()
-
-        # Check if we've reached the end
-        if geod.Inverse(current[1], current[0], end[1], end[0])['s12'] < 5000:
-            return reconstruct_path(current, visited)
-
-        # Explore neighbors
-        for neighbor in get_neighbors(current, grid):
-            if neighbor not in visited:
-                visited[neighbor] = current
-                queue.append(neighbor)
-
-    return None
+    # Otherwise do the full check
+    water_count = sum(1 for pt in points if not LAND.geometry.unary_union.intersects(pt))
+    return (water_count / len(points)) >= threshold
 
 
-def get_neighbors(point, grid):
-    """Get valid water neighbors within search distance"""
-    lon, lat = point
-    neighbors = []
+def find_nearest_water(lat, lon, search_radius=10):
+    """
+    Optimized nearest water search using spiral pattern and early termination.
+    """
+    step_size = 0.05  # degrees
+    max_steps = int(search_radius / (geodesic((lat, lon), (lat + step_size, lon)).km))
 
-    for dlon in [-GRID_RESOLUTION, 0, GRID_RESOLUTION]:
-        for dlat in [-GRID_RESOLUTION, 0, GRID_RESOLUTION]:
-            if dlon == 0 and dlat == 0:
-                continue
+    # Spiral search pattern
+    for step in range(1, max_steps + 1):
+        for angle in np.linspace(0, 2 * math.pi, 12 * step, endpoint=False):
+            new_lat = lat + step * step_size * math.cos(angle)
+            new_lon = lon + step * step_size * math.sin(angle)
+            if is_water(new_lat, new_lon):
+                return (new_lat, new_lon)
 
-            new_lon = lon + dlon
-            new_lat = lat + dlat
-            if (new_lon, new_lat) in grid and grid[(new_lon, new_lat)]:
-                neighbors.append((new_lon, new_lat))
-
-    return neighbors
-
-
-def reconstruct_path(end, visited):
-    """Backtrack from end point to start"""
-    path = []
-    current = end
-
-    while current:
-        path.append(current)
-        current = visited[current]
-
-    return path[::-1]
+    return (lat, lon)
 
 
-def generate_continuous_route(start, end):
-    """Generate complete maritime route"""
-    # Find initial water entry
-    if not is_in_water(*start):
-        water_start = find_water_entry(start, end)
-        if not water_start:
-            raise ValueError("Start point is landlocked")
-    else:
-        water_start = start
+def generate_grid(start, end, step=0.1):
+    """
+    Optimized grid generation with spatial indexing and smarter connectivity.
+    """
+    G = nx.Graph()
+    min_lat, max_lat = sorted([start[0], end[0]])
+    min_lon, max_lon = sorted([start[1], end[1]])
 
-    # Create navigation grid
-    grid = create_maritime_grid(water_start, end)
+    # Create bounding box to limit our search area
+    bbox = box(min_lon - step, min_lat - step, max_lon + step, max_lat + step)
 
-    # Find path using BFS
-    path = bfs_maritime_route(water_start, end, grid)
-    if not path:
-        raise ValueError("No navigable path found")
+    # Pre-filter land polygons that intersect our area of interest
+    relevant_land = LAND[LAND.intersects(bbox)]
 
-    # Convert to (lat, lon) format
-    return [(p[1], p[0]) for p in path]
+    # Generate all candidate points
+    lat_range = np.arange(min_lat, max_lat + step, step)
+    lon_range = np.arange(min_lon, max_lon + step, step)
+
+    # Add water nodes
+    water_nodes = []
+    for lat, lon in product(lat_range, lon_range):
+        if not relevant_land.geometry.unary_union.intersects(Point(lon, lat)):
+            G.add_node((lat, lon))
+            water_nodes.append((lat, lon))
+
+    # Connect nodes more efficiently
+    for i, (lat, lon) in enumerate(water_nodes):
+        # Only check forward to avoid duplicate edges
+        for other_lat, other_lon in water_nodes[i + 1:i + 100]:  # Limit search window
+            if abs(lat - other_lat) <= step and abs(lon - other_lon) <= step:
+                dist = geodesic((lat, lon), (other_lat, other_lon)).meters
+                G.add_edge((lat, lon), (other_lat, other_lon), weight=dist)
+
+    return G
+
+def getRouteHamburgBoston():
+    return [(53.537106, 9.904600), (53.542296, 9.894299), (53.557647, 9.778191), (53.573549, 9.644773), (53.606490, 9.580087), (53.625598, 9.540809), (53.714932, 9.480116), (53.754404, 9.407250), (53.860787, 9.302734), (53.881083, 9.059012), (53.910936, 8.782155), (54.537275, 7.785740), (53.819088, 3.769683), (51.352738, 1.983865), (50.158297, -0.950792), (48.693560, -8.924414), (41.586859, -47.659306), (41.958047, -67.688296), (42.412966, -70.245956), (42.383541, -70.832197), (42.380052, -70.902690), (42.336982, -70.950215), (42.340784, -70.997795), (42.344107, -71.013300), (42.342809, -71.021043)]
 
 
-def find_water_entry(start, end, steps=20):
-    """Binary search to find water entry point"""
-    geod = Geodesic.WGS84
-    line = geod.InverseLine(start[1], start[0], end[1], end[0])
+def find_best_shipping_route(start, end):
+    """
+    Optimized route finding with caching and early checks.
+    """
+    # Adjust start and end points if on land
+    start = find_nearest_water(*start)
+    end = find_nearest_water(*end)
 
-    low = 0
-    high = line.s13
+    # Early check if start and end are the same
+    if start == end:
+        return [start]
 
-    for _ in range(steps):
-        mid = (low + high) / 2
-        point = line.Position(mid, Geodesic.STANDARD | Geodesic.LONG_UNROLL)
-        if is_in_water(point['lon2'], point['lat2']):
-            high = mid
-        else:
-            low = mid
+    G = generate_grid(start, end)
 
-    final_point = line.Position(high, Geodesic.STANDARD | Geodesic.LONG_UNROLL)
-    return (final_point['lon2'], final_point['lat2'])
+    if start not in G.nodes or end not in G.nodes:
+        raise ValueError("Could not find enough water nodes nearby.")
+
+    try:
+        path = nx.shortest_path(G, source=start, target=end, weight='weight')
+        return path
+    except nx.NetworkXNoPath:
+        # Try with a coarser grid if no path found
+        G = generate_grid(start, end, step=0.2)
+        return nx.shortest_path(G, source=start, target=end, weight='weight')
 
 
 # Example usage
-start_point = (2.3522, 48.8566)  # (lon, lat) Paris
-end_point = (-74.0060, 40.7128)  # (lon, lat) New York
+if __name__ == "__main__":
+    start_point = (53.5461, 9.9937)  # Hamburg, Germany
+    end_point = (34.0522, -118.2437)  # Los Angeles, USA
 
-try:
-    route = generate_continuous_route(start_point, end_point)
-    print("Continuous Maritime Route:")
-    for idx, (lat, lon) in enumerate(route):
-        print(f"{idx + 1}: {lat:.6f}, {lon:.6f}")
-except ValueError as e:
-    print(f"Routing failed: {str(e)}")
+    route = find_best_shipping_route(start_point, end_point)
+
+    print("Optimized Shipping Route Waypoints:")
+    for i, (lat, lon) in enumerate(route, start=1):
+        print(f"{lon:.6f}, {lat:.6f}")
