@@ -7,6 +7,8 @@ from scraping.traffic_data.traffic_issues import traffic_issues
 import scraping.train_data.scarpeTrainStations as ts
 import scraping.train_data.scrapeTrainData as train_data
 
+from src.scraping.wetter_data import wetter_scraper
+
 
 def get_ship_data(locationStart, locationTaget):
     return {
@@ -26,8 +28,9 @@ def get_air_data(locationStart, locationTaget):
         datetime.datetime.max : 100
     }
 
-def get_wetter_data(edge):
-    return WetterEnum.WeatherCondition.SUNNY
+def get_wetter_data(location_lat, location_lon):
+    return wetter_scraper.get_wetter_data(round(location_lat, 1), round(location_lon, 1))
+
 
 def unavailabe_edges():
     return [1, 1232, 12322, 23231]
