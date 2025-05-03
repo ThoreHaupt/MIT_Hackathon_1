@@ -2,16 +2,41 @@ def plan_route(start, destination, settings):
 
     # Simulated multimodal route: Truck to Chicago, Train to LA
     return {
-        "steps": [
-            f"Truck from {start["name"]} to {destination["name"]}",
-        ],
-        "duration": "12 hours",
-        "cost_estimate": "$1,800",
-        "co2_emissions": "200 kg CO2",
-        "segments": [
-            {
-                "type": "Truck",
-                "path": [start["coords"], destination["coords"]]
-            }
+        "route_segments": [
+        { "type": "Truck", # in {"Truck", "Train", "Ship", "Plane"}
+            "path": [start["coords"], [3, 6]], # Coordinates of origin and destination
+            "distance": 10, # in m
+            "duration": 3600, # in s
+            "cost": 100, # in s
+            "co2_emissions": 50, # in CO₂e
+        }, 
+        { "type": "Train",
+            "path": [[3, 6], [7, 8]], # Coordinates of origin and destination
+            "distance": 20, # in m
+            "duration": 7200, # in s
+            "cost": 200, # in s
+            "co2_emissions": 100, # in CO₂e
+        }, 
+        { "type": "Train",
+            "path": [[7, 8], [10, 8]], # Coordinates of origin and destination
+            "distance": 30, # in m
+            "duration": 10800, # in s
+            "cost": 300, # in s
+            "co2_emissions": 150, # in CO₂e
+        },
+        { "type": "Air",
+            "path": [[10, 8], [15, 3]], # Coordinates of origin and destination
+            "distance": 30, # in m
+            "duration": 10800, # in s
+            "cost": 300, # in s
+            "co2_emissions": 150, # in CO₂e
+        },
+        { "type": "Train",
+            "path": [[15, 3], destination["coords"]],
+            "distance": 40, # in m
+            "duration": 14400, # in s
+            "cost": 400, # in s
+            "co2_emissions": 200,
+        }
         ]
     }

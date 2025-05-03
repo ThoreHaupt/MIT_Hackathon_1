@@ -61,8 +61,8 @@ function loadRoute() {
     .then(response => response.json())
     .then(route => {
         console.log("Route data:", route);
-        const segments = route.segments;
-        const modeColors = {
+        const segments = route.route_segments;
+        const typeColors = {
             "Truck": "blue",
             "Train": "green",
             "Ship": "navy",
@@ -76,11 +76,44 @@ function loadRoute() {
             }
         });
 
-        // Draw each segment with color by type
+        // Combine consecutive segments of the same type
+        const combinedSegments = [];
+        let currentSegment = null;
+
         segments.forEach(segment => {
-            const color = modeColors[segment.type] || 'gray';
+            if (currentSegment && currentSegment.type === segment.type) {
+            // Extend the current segment
+            currentSegment.path = currentSegment.path.concat(segment.path.slice(1));
+            currentSegment.distance += segment.distance;
+            currentSegment.duration += segment.duration;
+            currentSegment.cost += segment.cost;
+            currentSegment.co2_emissions += segment.co2_emissions;
+            } else {
+            // Start a new segment
+            if (currentSegment) {
+                combinedSegments.push(currentSegment);
+            }
+            currentSegment = { ...segment };
+            }
+        });
+
+        // Push the last segment
+        if (currentSegment) {
+            combinedSegments.push(currentSegment);
+        }
+
+        // Draw each combined segment with color by type
+        combinedSegments.forEach(segment => {
+            const color = typeColors[segment.type] || 'gray';
+            const popupContent = `
+            <strong>Type:</strong> ${segment.type}<br>
+            <strong>Distance:</strong> ${segment.distance} km<br>
+            <strong>Duration:</strong> ${segment.duration} hours<br>
+            <strong>Cost:</strong> ${segment.cost}$<br>
+            <strong>CO2 Equivalent:</strong> ${segment.co2_emissions} kg
+            `;
             L.polyline(segment.path, { color: color, weight: 5 }).addTo(map)
-                .bindPopup(`Mode: ${segment.type}`);
+            .bindPopup(popupContent);
         });
 
         // Add markers at start and end
