@@ -36,6 +36,18 @@
                     </button>
                 </div>
             </div>
+
+            <div>
+                <label for="freightSize" class="block text-sm font-medium text-gray-700">Size (m³):</label>
+                <input type="number" id="freightSize" name="freightSize" placeholder="Enter size of your freight in cubic meters" required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <div>
+                <label for="freightWeight" class="block text-sm font-medium text-gray-700">Weight (kg):</label>
+                <input type="number" id="freightWeight" name="freightWeight" placeholder="Enter weight of your freight in kilograms" required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
         
             <div>
                 <label class="block text-sm font-medium text-gray-700">Mode of Transport:</label>
@@ -99,7 +111,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map', {zoomControl: false}).setView([42.36018610476105, -71.09414927401798], 4); // MIT
+        const map = L.map('map', {zoomControl: false}).setView([42.36018610476105, -71.09414927401798], 7); // Default to MIT
         L.control.zoom({
             position: 'bottomright'
         }).addTo(map);
@@ -107,6 +119,20 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
+
+        // Set view to user's location if available
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                map.setView([lat, lon], 10); // Center map on user's location
+                L.marker([lat, lon]).addTo(map).openPopup();
+            }, function(error) {
+                console.error("Geolocation failed:", error);
+            });
+        } else {
+            console.warn("Geolocation is not supported by this browser.");
+        }
 
         // Optional: Common freight hubs
         const hubs = [];
@@ -157,6 +183,8 @@
             formData.append('co2Importance', document.getElementById('co2-slider').value);
             formData.append('moneyImportance', document.getElementById('money-slider').value);
             formData.append('riskImportance', document.getElementById('risk-slider').value);
+            formData.append('freightWeight', document.getElementById('freightWeight').value);
+            formData.append('freightSize', document.getElementById('freightSize').value);
 
             fetch('http://localhost:5000/route', {
                 method: 'POST',
@@ -179,11 +207,11 @@
                     }
                 });
 
-                // Draw each segment with color by mode
+                // Draw each segment with color by type
                 segments.forEach(segment => {
-                    const color = modeColors[segment.mode] || 'gray';
+                    const color = modeColors[segment.type] || 'gray';
                     L.polyline(segment.path, { color: color, weight: 5 }).addTo(map)
-                        .bindPopup(`Mode: ${segment.mode}`);
+                        .bindPopup(`Mode: ${segment.type}`);
                 });
 
                 // Add markers at start and end

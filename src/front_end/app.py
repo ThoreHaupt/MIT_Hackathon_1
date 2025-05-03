@@ -22,9 +22,11 @@ def route():
         "use_ship": request.form.get('shipCheckBox') == 'on',
         "use_plane": request.form.get('airCheckBox') == 'on',
         "weight_time": float(request.form.get('timeImportance', 0)),
-        "co2_weight": float(request.form.get('co2Importance', 0)),
-        "money_weight": float(request.form.get('moneyImportance', 0)),
-        "risk_weight": float(request.form.get('riskImportance', 0)),
+        "weight_co2": float(request.form.get('co2Importance', 0)),
+        "weight_money": float(request.form.get('moneyImportance', 0)),
+        "weight_risk": float(request.form.get('riskImportance', 0)),
+        "freight_weight": float(request.form.get('freightWeight', 0)),
+        "freight_size": float(request.form.get('freightSize', 0)),
     }
 
     route_data = plan_route({"name": origin, "coords": origin_coords}, {"name": destination, "coords": destination_coords}, settings)

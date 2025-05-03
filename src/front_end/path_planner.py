@@ -10,7 +10,7 @@ def plan_route(origin, destination, settings):
         "co2_emissions": "200 kg CO2",
         "segments": [
             {
-                "mode": "Truck",
+                "type": "Truck",
                 "path": [origin["coords"], destination["coords"]]
             }
         ]
