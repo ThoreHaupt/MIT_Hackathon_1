@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="map" class="absolute inset-0 z-0"></div>
-    <div class="absolute z-10 top-10 left-20 max-w-md mx-auto mt-10 bg-white/90 shadow-lg rounded-xl p-6">
+    <div class="absolute z-10 top-5 left-5 max-w-md mx-auto bg-white/90 shadow-lg rounded-xl p-6">
         <div class="space-y-4 w-96">
             <div>
                 <label for="start" class="block text-sm font-medium text-gray-700">Start:</label>
@@ -97,7 +97,16 @@
             </div>
         </div>
     </div>
-
+    <!-- Legend for types of transport -->
+    <div class="absolute bottom-5 left-5 bg-white/90 shadow-lg rounded-xl p-4">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">Transport Legend</h3>
+        <ul class="space-y-1 text-sm text-gray-700">
+            <li><span class="inline-block w-4 h-4 bg-blue-500 rounded-full mr-2"></span>Truck</li>
+            <li><span class="inline-block w-4 h-4 bg-green-500 rounded-full mr-2"></span>Train</li>
+            <li><span class="inline-block w-4 h-4 bg-yellow-500 rounded-full mr-2"></span>Ship</li>
+            <li><span class="inline-block w-4 h-4 bg-red-500 rounded-full mr-2"></span>Air</li>
+        </ul>
+    </div>
 
 
     
