@@ -61,7 +61,7 @@ function loadRoute() {
     .then(data => {
         const segments = data.route_segments;
         const typeColors = {
-            "Truck": "blue",
+            "Truck": "yellow",
             "Train": "green",
             "Ship": "navy",
             "Plane": "red"
@@ -103,10 +103,12 @@ function loadRoute() {
         // Draw each combined segment with color by type
         combinedSegments.forEach(segment => {
             const color = typeColors[segment.type] || 'gray';
+            const hours = Math.floor(segment.duration / 3600);
+            const minutes = Math.floor((segment.duration % 3600) / 60);
             const popupContent = `
             <strong>Type:</strong> ${segment.type}<br>
-            <strong>Distance:</strong> ${segment.distance} km<br>
-            <strong>Duration:</strong> ${segment.duration} hours<br>
+            <strong>Distance:</strong> ${(segment.distance / 1000)} km<br>
+            <strong>Duration:</strong> ${hours} hours ${minutes} minutes<br>
             <strong>Cost:</strong> ${segment.cost}$<br>
             <strong>CO2 Equivalent:</strong> ${segment.co2_emissions} kg
             `;
