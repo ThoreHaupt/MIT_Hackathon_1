@@ -13,46 +13,73 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Form Section -->
-            <div class="col-md-4 p-4">
-                <h2>Transport Planning</h2>
-                <form id="transportForm" method="POST">
-                    <div class="mb-3">
-                        <label for="start_point" class="form-label">Starting Point</label>
-                        <input type="text" class="form-control" id="start_point" name="start_point" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="end_point" class="form-label">Destination</label>
-                        <input type="text" class="form-control" id="end_point" name="end_point" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="product_type" class="form-label">Product Type</label>
-                        <select class="form-select" id="product_type" name="product_type" required>
-                            <option value="general">General Cargo</option>
-                            <option value="perishable">Perishable Goods</option>
-                            <option value="hazardous">Hazardous Materials</option>
-                            <option value="bulk">Bulk Cargo</option>
-                        </select>
-                    </div>
-                    <h4>Priority Weights</h4>
-                    <div class="mb-3">
-                        <label for="time_weight" class="form-label">Time Importance (1-10)</label>
-                        <input type="range" class="form-range" id="time_weight" name="time_weight" min="1" max="10" value="5">
-                    </div>
-                    <div class="mb-3">
-                        <label for="cost_weight" class="form-label">Cost Importance (1-10)</label>
-                        <input type="range" class="form-range" id="cost_weight" name="cost_weight" min="1" max="10" value="5">
-                    </div>
-                    <div class="mb-3">
-                        <label for="carbon_weight" class="form-label">Carbon Footprint Importance (1-10)</label>
-                        <input type="range" class="form-range" id="carbon_weight" name="carbon_weight" min="1" max="10" value="5">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Calculate Route</button>
-                </form>
+            <!-- Route Alternatives Section -->
+            <div class="col-md-4 p-4 alternatives-section">
+                <h2>Route Alternatives</h2>
+                <div class="mb-3">
+                    <label for="sortBy" class="form-label">Sort By</label>
+                    <select class="form-select" id="sortBy">
+                        <option value="cost">Cost</option>
+                        <option value="time">Time</option>
+                        <option value="carbon">Carbon Emissions</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="filterTransport" class="form-label">Filter by Transport Mode</label>
+                    <select class="form-select" id="filterTransport">
+                        <option value="all">All Modes</option>
+                        <option value="road">Road</option>
+                        <option value="rail">Rail</option>
+                        <option value="sea">Sea</option>
+                        <option value="air">Air</option>
+                    </select>
+                </div>
+                <div id="routeAlternatives" class="route-list">
+                    <!-- Route alternatives will be populated here -->
+                </div>
             </div>
-            
-            <!-- Map Section -->
-            <div class="col-md-8 p-0">
+
+            <!-- Map and Form Section -->
+            <div class="col-md-8 p-0 map-section">
+                <!-- Form Section -->
+                <div class="planning-form">
+                    <h2>Transport Planning</h2>
+                    <form id="transportForm" method="POST">
+                        <div class="mb-3">
+                            <label for="start_point" class="form-label">Starting Point</label>
+                            <input type="text" class="form-control" id="start_point" name="start_point" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_point" class="form-label">Destination</label>
+                            <input type="text" class="form-control" id="end_point" name="end_point" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="product_type" class="form-label">Product Type</label>
+                            <select class="form-select" id="product_type" name="product_type" required>
+                                <option value="general">General Cargo</option>
+                                <option value="perishable">Perishable Goods</option>
+                                <option value="hazardous">Hazardous Materials</option>
+                                <option value="bulk">Bulk Cargo</option>
+                            </select>
+                        </div>
+                        <h4>Priority Weights</h4>
+                        <div class="mb-3">
+                            <label for="time_weight" class="form-label">Time Importance (1-10)</label>
+                            <input type="range" class="form-range" id="time_weight" name="time_weight" min="1" max="10" value="5">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cost_weight" class="form-label">Cost Importance (1-10)</label>
+                            <input type="range" class="form-range" id="cost_weight" name="cost_weight" min="1" max="10" value="5">
+                        </div>
+                        <div class="mb-3">
+                            <label for="carbon_weight" class="form-label">Carbon Footprint Importance (1-10)</label>
+                            <input type="range" class="form-range" id="carbon_weight" name="carbon_weight" min="1" max="10" value="5">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Calculate Route</button>
+                    </form>
+                </div>
+
+                <!-- Map Section -->
                 <div id="map"></div>
             </div>
         </div>
