@@ -77,8 +77,11 @@ def featch_constructions(road_id):
             latitude = float(item["coordinate"]["lat"])
             description = " ".join(item["description"])
             isBlocked = item["isBlocked"] == "true"
-            estimatedTimeLoss = 0.0
-            beginTime = datetime.datetime.fromisoformat(item["startTimestamp"])
+            estimatedTimeLoss = parse_time_loss(item["description"]).total_seconds()
+            try:
+                beginTime = datetime.datetime.fromisoformat(item["startTimestamp"])
+            except Exception as e:
+                pass
             endTime = parse_end_time(item["description"])
 
             traffic_issues.append(TrafficIssue(longitude, latitude, description, isBlocked,
