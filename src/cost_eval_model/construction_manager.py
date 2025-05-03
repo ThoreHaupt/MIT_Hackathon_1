@@ -2,7 +2,7 @@
 
 class ConstructionManager:
     def __init__(self, construction_dict_array:list):
-        self.calculate_construction_buckets(construction_dict_array)
+        self.calculate_construction_buckets([obj.to_dict() for obj in construction_dict_array])
 
 
     def bucket_hash(self, lat:float, lng:float) -> str:
@@ -24,7 +24,7 @@ class ConstructionManager:
         if bucket in self.construction_dict:
             # check if construction site is closer than 4km lat distance is 0.04 and lng distance is 0.04
             for construction in self.construction_dict[bucket]:
-                if abs(construction['lat'] - lat) < 0.03 and abs(construction['lng'] - lng) < 0.03:
+                if abs(construction.to_dict()['latitude'] - lat) < 0.03 and abs(construction.to_dict()['longitude'] - lng) < 0.03:
                     return construction
         return None
         
@@ -35,8 +35,8 @@ class ConstructionManager:
         """
         self.construction_dict = {}
         for construction in construction_dict_array:
-            lat = construction['lat']
-            lng = construction['lng']
+            lat = construction['latitude']
+            lng = construction['longitude']
             bucket = self.bucket_hash(lat, lng)
             if bucket not in self.construction_dict:
                 self.construction_dict[bucket] = []

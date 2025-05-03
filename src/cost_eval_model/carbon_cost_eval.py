@@ -7,10 +7,6 @@ class CarbonCostModel(CostModel):
     """
     This class is used to evaluate the cost of a carbon model.
     """
-
-    def __init__(self, carbon_model):
-        self.carbon_model = carbon_model
-
     def evaluate(self, data, settings: dict):
         """
         Evaluate the cost of the carbon model.
@@ -19,29 +15,29 @@ class CarbonCostModel(CostModel):
         """
         carbon_cost = 0
         
-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
             carbon_cost = 1000
             return carbon_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
             carbon_cost = 1000
             return carbon_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
             carbon_cost = 1000
             return carbon_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
             carbon_cost = 1000
             return carbon_cost
         
         dist_in_km = data["distance_next_edge"]
         # data["dist_mode_start_next_edge"] += dist_in_km
         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
-            if data["origin"]["mode_next_edge"] == 'train':
+            if data["destination"]["mode_next_edge"] == 'train':
                 carbon_cost = carbon_rail_per_km_per_ton * dist_in_km
-            elif data["origin"]["mode_next_edge"] == 'air':
+            elif data["destination"]["mode_next_edge"] == 'plane':
                 carbon_cost = carbon_air_per_km_per_ton * dist_in_km
-            elif data["origin"]["mode_next_edge"] == 'truck':
+            elif data["destination"]["mode_next_edge"] == 'truck':
                 carbon_cost = carbon_truck_per_km_per_ton * dist_in_km
-            elif data['origin']['mode_next_edge'] == "ship":
+            elif data['destination']['mode_next_edge'] == "ship":
                 carbon_cost = carbon_ship_per_km_per_ton
         else:
             carbon_cost = 0

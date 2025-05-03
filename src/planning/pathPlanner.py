@@ -29,5 +29,5 @@ class PathPlanner:
         v_point = (self.graph.nodes[v]['x'], self.graph.nodes[v]['y'])
         return self.haversine(*u_point, *v_point)
 
-    def calculate_path(self, orig, dest):
+    def calculate_path(self, orig, dest, settings):
         return astar_path(self.graph, orig, dest, heuristic=self.heuristic, weight=self.custom_cost)

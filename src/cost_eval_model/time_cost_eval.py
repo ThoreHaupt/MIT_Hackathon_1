@@ -3,10 +3,7 @@ from .params import *
 from .cost_model import CostModel
 
 class TimeCostModel(CostModel):
-    def __init__(self, time_cost):
-        self.time_cost = time_cost
-
-    def evaluate(self, data, construction_manager, transport_time_api, settings: dict):
+    def evaluate(self, data, construction_manager, settings: dict):
 
         """
         Calculate the time per km for each transport type.
@@ -16,16 +13,16 @@ class TimeCostModel(CostModel):
         # current_time = data["time_prior_edge_end"]
         time_cost = 0
 
-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
             time_cost = 1000
             return time_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
             time_cost = 1000
             return time_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
             time_cost = 1000
             return time_cost
-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
             time_cost = 1000
             return time_cost
 
@@ -42,7 +39,7 @@ class TimeCostModel(CostModel):
             # fetch wait time from
             #next_leave_time = transport_time_api.get_next_departure_time(data['origin']['lat'], data['origin']['lng'], data['destination']['lat'], data['destination']['lng'], data['origin']['mode_prior_edge'], data['destination']['mode_next_edge'])
             #wait_time = next_leave_time - current_time
-            if data['origin']['mode_next_edge'] == 'air':
+            if data['destination']['mode_next_edge'] == 'plane':
                 time_cost = data["time_next_edge_end"] - data["time_prior_edge_end"]
             else:
                 wait_time = 3

@@ -21,7 +21,7 @@ class RiskCostModel(CostModel):
 
         :param model: The model to be evaluated.
         """
-        self.keras_utilitization_model = tf.keras.load_model(KERAS_MODEL_PATH)
+        self.keras_utilitization_model = tf.keras.models.load_model(KERAS_MODEL_PATH)
         self.scaler = StandardScaler()
         
 
@@ -37,12 +37,12 @@ class RiskCostModel(CostModel):
             "origin": { 
                 "lat": 0,
                 "lng": 0
-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
+                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
             },
             "destination": {
                 "lat": 0,
                 "lng": 0,
-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
+                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
             },
             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
             "max_speed_next_edge": 0, 
@@ -70,16 +70,16 @@ class RiskCostModel(CostModel):
         risk_score = 0
         # Placeholder for actual evaluation logic
 
-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
             risk_score = 1000
             return risk_score
-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
             risk_score = 1000
             return risk_score
-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
             risk_score = 1000
             return risk_score
-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
             risk_score = 1000
             return risk_score
 
@@ -92,9 +92,9 @@ class RiskCostModel(CostModel):
             # Example of using the keras model for risk score calculation
             # input vector: ['Land', 'Strnum', 'Wotag', 'Stunde', 'Monat','inhab_plz', 'density', 'inhab_100']
             time_end: datetime.datetime = data['time_prior_edge_end']
-            week_day = datetime.strftime("%A")
-            hour = datetime.strftime("%H")
-            monat = datetime.strftime("%m")
+            week_day = time_end.weekday()
+            hour = time_end.hour()
+            monat = time_end.month()
 
             dat = super().get_plz_data(data['origin']['lat'], data['origin']['lng'])
             inhab_plz = dat['inhab_plz']

@@ -13,13 +13,13 @@ function fillRouteDetails(route) {
     let contains_ship = false;
     let contains_plane = false;
     route.forEach(segment => {
-        if (segment.type === 'Truck') {
+        if (segment.type === 'truck') {
             contains_truck = true;
-        } else if (segment.type === 'Train') {
+        } else if (segment.type === 'train') {
             contains_train = true;
-        } else if (segment.type === 'Ship') {
+        } else if (segment.type === 'ship') {
             contains_ship = true;
-        } else if (segment.type === 'Plane') {
+        } else if (segment.type === 'plane') {
             contains_plane = true;
         } 
         duration += segment.duration;
@@ -124,10 +124,10 @@ function loadRoute() {
     .then(data => {
         const segments = data.route_segments;
         const typeColors = {
-            "Truck": "yellow",
-            "Train": "green",
-            "Ship": "navy",
-            "Plane": "red"
+            "truck": "yellow",
+            "train": "green",
+            "ship": "navy",
+            "plane": "red"
         };
 
         // Clear existing layers from the map

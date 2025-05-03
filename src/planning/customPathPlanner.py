@@ -24,12 +24,12 @@ class CustomPathPlanner:
             "origin": { 
                 "lat": 0,
                 "lng": 0
-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
+                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
             },
             "destination": {
                 "lat": 0,
                 "lng": 0,
-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
+                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
             },
             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
             "max_speed_next_edge": 0, [km/h]
@@ -37,21 +37,24 @@ class CustomPathPlanner:
             "distance_mode_start_next_edge": 0, [km]
             "time_prior_edge_end": 0, 
         } """
-        data["origin"]["lat"] = self.G.nodes[u]['y']
-        data["origin"]["lng"] = self.G.nodes[u]['x']
-        data["origin"]["mode_prior_edge"] = data.get("type", "Truck")
-        data["destination"]["lat"] = self.G.nodes[v]['y']
-        data["destination"]["lng"] = self.G.nodes[v]['x']
-        data["destination"]["mode_next_edge"] = previous_edge_data[u].get("type", "Truck")
-        data["highway"] = data.get("highway", "motorway")
-        data["max_speed_next_edge"] = data.get("max_speed", 0)
-        data["distance_next_edge"] = data.get("length", 0) / 1000  # Convert to km
-        data["distance_mode_start_next_edge"] = path_of_type.get("length", 0) / 1000  # Convert to km
-        data["time_prior_edge_end"] = current_time
-        data["time_next_edge_end"] = current_time 
+        data_dict = {}
+        data_dict["origin"] = {}
+        data_dict["destination"] = {}
+        data_dict["origin"]["lat"] = self.G.nodes[u]['y']
+        data_dict["origin"]["lng"] = self.G.nodes[u]['x']
+        data_dict["origin"]["mode_prior_edge"] = data.get("type", "truck")
+        data_dict["destination"]["lat"] = self.G.nodes[v]['y']
+        data_dict["destination"]["lng"] = self.G.nodes[v]['x']
+        data_dict["destination"]["mode_next_edge"] = previous_edge_data.get("type", "truck")
+        data_dict["highway"] = data.get("highway", "motorway")
+        data_dict["max_speed_next_edge"] = 80
+        data_dict["distance_next_edge"] = data.get("length", 0) / 1000  # Convert to km
+        data_dict["distance_mode_start_next_edge"] = path_of_type.get("length", 0) / 1000  # Convert to km
+        data_dict["time_prior_edge_end"] = current_time
+        data_dict["time_next_edge_end"] = current_time 
 
         base_cost = data.get("length", 1)
-        custom_costs = self.cost_api.get_cost(data)
+        custom_costs = self.cost_api.get_cost(data_dict)
         return custom_costs  # Default to base cost if not found
 
     def get_travel_time(self, u, v, data, current_time):
@@ -147,7 +150,7 @@ class CustomPathPlanner:
                     f_score[neighbor] = tentative_g_score + heuristic_cost
                     times[neighbor] = times[current] + costs.get("time_cost", 0)
 
-                    transport_mode = edge_data.get("type", "Truck")
+                    transport_mode = edge_data.get("type", "truck")
                     mode_of_transport[neighbor] = transport_mode
 
                     if transport_mode == mode_of_transport[current]:

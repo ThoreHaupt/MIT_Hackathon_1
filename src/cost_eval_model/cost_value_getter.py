@@ -79,12 +79,12 @@ class CostAPI:
             "origin": { 
                 "lat": 0,
                 "lng": 0
-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
+                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
             },
             "destination": {
                 "lat": 0,
                 "lng": 0,
-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
+                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
             },
             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
             "max_speed_next_edge": 0, [km/h]

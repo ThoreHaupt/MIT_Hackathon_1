@@ -1,0 +1,525 @@
+diff --git a/src/cost_eval_model/carbon_cost_eval.py b/src/cost_eval_model/carbon_cost_eval.py
+index 25a5091..9907e12 100644
+--- a/src/cost_eval_model/carbon_cost_eval.py
++++ b/src/cost_eval_model/carbon_cost_eval.py
+@@ -7,10 +7,6 @@ class CarbonCostModel(CostModel):
+     """
+     This class is used to evaluate the cost of a carbon model.
+     """
+-
+-    def __init__(self, carbon_model):
+-        self.carbon_model = carbon_model
+-
+     def evaluate(self, data, settings: dict):
+         """
+         Evaluate the cost of the carbon model.
+@@ -19,29 +15,29 @@ class CarbonCostModel(CostModel):
+         """
+         carbon_cost = 0
+         
+-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
++        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
+             carbon_cost = 1000
+             return carbon_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
+             carbon_cost = 1000
+             return carbon_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
+             carbon_cost = 1000
+             return carbon_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
+             carbon_cost = 1000
+             return carbon_cost
+         
+         dist_in_km = data["distance_next_edge"]
+         # data["dist_mode_start_next_edge"] += dist_in_km
+         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
+-            if data["origin"]["mode_next_edge"] == 'train':
++            if data["destination"]["mode_next_edge"] == 'train':
+                 carbon_cost = carbon_rail_per_km_per_ton * dist_in_km
+-            elif data["origin"]["mode_next_edge"] == 'air':
++            elif data["destination"]["mode_next_edge"] == 'plane':
+                 carbon_cost = carbon_air_per_km_per_ton * dist_in_km
+-            elif data["origin"]["mode_next_edge"] == 'truck':
++            elif data["destination"]["mode_next_edge"] == 'truck':
+                 carbon_cost = carbon_truck_per_km_per_ton * dist_in_km
+-            elif data['origin']['mode_next_edge'] == "ship":
++            elif data['destination']['mode_next_edge'] == "ship":
+                 carbon_cost = carbon_ship_per_km_per_ton
+         else:
+             carbon_cost = 0
+diff --git a/src/cost_eval_model/construction_manager.py b/src/cost_eval_model/construction_manager.py
+index eb5f6e3..418dcd4 100644
+--- a/src/cost_eval_model/construction_manager.py
++++ b/src/cost_eval_model/construction_manager.py
+@@ -2,7 +2,7 @@
+ 
+ class ConstructionManager:
+     def __init__(self, construction_dict_array:list):
+-        self.calculate_construction_buckets(construction_dict_array)
++        self.calculate_construction_buckets([obj.to_dict() for obj in construction_dict_array])
+ 
+ 
+     def bucket_hash(self, lat:float, lng:float) -> str:
+@@ -24,7 +24,7 @@ class ConstructionManager:
+         if bucket in self.construction_dict:
+             # check if construction site is closer than 4km lat distance is 0.04 and lng distance is 0.04
+             for construction in self.construction_dict[bucket]:
+-                if abs(construction['lat'] - lat) < 0.03 and abs(construction['lng'] - lng) < 0.03:
++                if abs(construction.to_dict()['latitude'] - lat) < 0.03 and abs(construction.to_dict()['longitude'] - lng) < 0.03:
+                     return construction
+         return None
+         
+@@ -35,8 +35,8 @@ class ConstructionManager:
+         """
+         self.construction_dict = {}
+         for construction in construction_dict_array:
+-            lat = construction['lat']
+-            lng = construction['lng']
++            lat = construction['latitude']
++            lng = construction['longitude']
+             bucket = self.bucket_hash(lat, lng)
+             if bucket not in self.construction_dict:
+                 self.construction_dict[bucket] = []
+diff --git a/src/cost_eval_model/cost_value_getter.py b/src/cost_eval_model/cost_value_getter.py
+index c58746d..3bf4409 100644
+--- a/src/cost_eval_model/cost_value_getter.py
++++ b/src/cost_eval_model/cost_value_getter.py
+@@ -79,12 +79,12 @@ class CostAPI:
+             "origin": { 
+                 "lat": 0,
+                 "lng": 0
+-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
++                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "destination": {
+                 "lat": 0,
+                 "lng": 0,
+-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
++                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
+             "max_speed_next_edge": 0, [km/h]
+diff --git a/src/cost_eval_model/price_cost_eval.py b/src/cost_eval_model/price_cost_eval.py
+index 6c915eb..ef20c02 100644
+--- a/src/cost_eval_model/price_cost_eval.py
++++ b/src/cost_eval_model/price_cost_eval.py
+@@ -8,9 +8,6 @@ class PriceCostModel(CostModel):
+     This class is used to evaluate the cost of a price model.
+     """
+ 
+-    def __init__(self, price_model):
+-        self.price_model = price_model
+-
+     def evaluate(self, data, settings: dict):
+         """
+         Evaluate the cost of the price model.
+@@ -19,29 +16,29 @@ class PriceCostModel(CostModel):
+         """
+         edge_cost = 0
+ 
+-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
++        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
+             edge_cost = 1000
+             return edge_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
+             edge_cost = 1000
+             return edge_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
+             edge_cost = 1000
+             return edge_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
+             edge_cost = 1000
+             return edge_cost
+         
+         dist_in_km = data["distance_next_edge"]
+         # data["dist_mode_start_next_edge"] += dist_in_km
+         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
+-            if data["origin"]["mode_next_edge"] == 'train':
++            if data["destination"]["mode_next_edge"] == 'train':
+                 edge_cost = us_price_rail_per_km_per_ton*dist_in_km
+-            elif data["origin"]["mode_next_edge"] == 'air':
++            elif data["destination"]["mode_next_edge"] == 'plane':
+                 edge_cost = price_air_per_km_per_ton*dist_in_km
+-            elif data["origin"]["mode_next_edge"] == 'truck':
++            elif data["destination"]["mode_next_edge"] == 'truck':
+                 edge_cost = us_price_truck_per_km_per_ton*dist_in_km
+-            elif data['origin']['mode_next_edge'] == "ship":
++            elif data['destination']['mode_next_edge'] == "ship":
+                 edge_cost = price_ship_per_km_per_ton
+         else:
+             edge_cost = 2
+diff --git a/src/cost_eval_model/risk_cost_eval.py b/src/cost_eval_model/risk_cost_eval.py
+index 30de18d..895f010 100644
+--- a/src/cost_eval_model/risk_cost_eval.py
++++ b/src/cost_eval_model/risk_cost_eval.py
+@@ -21,7 +21,7 @@ class RiskCostModel(CostModel):
+ 
+         :param model: The model to be evaluated.
+         """
+-        self.keras_utilitization_model = tf.keras.load_model(KERAS_MODEL_PATH)
++        self.keras_utilitization_model = tf.keras.models.load_model(KERAS_MODEL_PATH)
+         self.scaler = StandardScaler()
+         
+ 
+@@ -37,12 +37,12 @@ class RiskCostModel(CostModel):
+             "origin": { 
+                 "lat": 0,
+                 "lng": 0
+-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
++                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "destination": {
+                 "lat": 0,
+                 "lng": 0,
+-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
++                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
+             "max_speed_next_edge": 0, 
+@@ -70,16 +70,16 @@ class RiskCostModel(CostModel):
+         risk_score = 0
+         # Placeholder for actual evaluation logic
+ 
+-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
++        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
+             risk_score = 1000
+             return risk_score
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
+             risk_score = 1000
+             return risk_score
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
+             risk_score = 1000
+             return risk_score
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
+             risk_score = 1000
+             return risk_score
+ 
+@@ -92,9 +92,9 @@ class RiskCostModel(CostModel):
+             # Example of using the keras model for risk score calculation
+             # input vector: ['Land', 'Strnum', 'Wotag', 'Stunde', 'Monat','inhab_plz', 'density', 'inhab_100']
+             time_end: datetime.datetime = data['time_prior_edge_end']
+-            week_day = datetime.strftime("%A")
+-            hour = datetime.strftime("%H")
+-            monat = datetime.strftime("%m")
++            week_day = time_end.weekday()
++            hour = time_end.hour()
++            monat = time_end.month()
+ 
+             dat = super().get_plz_data(data['origin']['lat'], data['origin']['lng'])
+             inhab_plz = dat['inhab_plz']
+diff --git a/src/cost_eval_model/time_cost_eval.py b/src/cost_eval_model/time_cost_eval.py
+index af828e7..ed903c8 100644
+--- a/src/cost_eval_model/time_cost_eval.py
++++ b/src/cost_eval_model/time_cost_eval.py
+@@ -3,10 +3,7 @@ from .params import *
+ from .cost_model import CostModel
+ 
+ class TimeCostModel(CostModel):
+-    def __init__(self, time_cost):
+-        self.time_cost = time_cost
+-
+-    def evaluate(self, data, construction_manager, transport_time_api, settings: dict):
++    def evaluate(self, data, construction_manager, settings: dict):
+ 
+         """
+         Calculate the time per km for each transport type.
+@@ -16,16 +13,16 @@ class TimeCostModel(CostModel):
+         # current_time = data["time_prior_edge_end"]
+         time_cost = 0
+ 
+-        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
++        if data['destination']['mode_next_edge'] == data.get("type", "truck") and not settings.get("use_truck", True):
+             time_cost = 1000
+             return time_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "ship") and not settings.get("use_ship", True):
+             time_cost = 1000
+             return time_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "train") and not settings.get("use_train", True):
+             time_cost = 1000
+             return time_cost
+-        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
++        if data['origin']['mode_prior_edge'] == data.get("type", "plane") and not settings.get("use_plane", True):
+             time_cost = 1000
+             return time_cost
+ 
+@@ -42,7 +39,7 @@ class TimeCostModel(CostModel):
+             # fetch wait time from
+             #next_leave_time = transport_time_api.get_next_departure_time(data['origin']['lat'], data['origin']['lng'], data['destination']['lat'], data['destination']['lng'], data['origin']['mode_prior_edge'], data['destination']['mode_next_edge'])
+             #wait_time = next_leave_time - current_time
+-            if data['origin']['mode_next_edge'] == 'air':
++            if data['destination']['mode_next_edge'] == 'plane':
+                 time_cost = data["time_next_edge_end"] - data["time_prior_edge_end"]
+             else:
+                 wait_time = 3
+diff --git a/src/cost_eval_model/traffic_pred/traffic_data_prediction_ger.ipynb b/src/cost_eval_model/traffic_pred/traffic_data_prediction_ger.ipynb
+index 92a799e..746437b 100644
+--- a/src/cost_eval_model/traffic_pred/traffic_data_prediction_ger.ipynb
++++ b/src/cost_eval_model/traffic_pred/traffic_data_prediction_ger.ipynb
+@@ -251,7 +251,7 @@
+      "traceback": [
+       "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+       "\u001b[0;31mKeyboardInterrupt\u001b[0m                         Traceback (most recent call last)",
+-      "Cell \u001b[0;32mIn[6], line 32\u001b[0m\n\u001b[1;32m     29\u001b[0m early_stopping \u001b[38;5;241m=\u001b[39m EarlyStopping(monitor\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mval_loss\u001b[39m\u001b[38;5;124m'\u001b[39m, patience\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m10\u001b[39m, restore_best_weights\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mTrue\u001b[39;00m)\n\u001b[1;32m     31\u001b[0m \u001b[38;5;66;03m# Train with early stopping\u001b[39;00m\n\u001b[0;32m---> 32\u001b[0m model\u001b[38;5;241m.\u001b[39mfit(\n\u001b[1;32m     33\u001b[0m     X_train, y_train,\n\u001b[1;32m     34\u001b[0m     epochs\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m100\u001b[39m,\n\u001b[1;32m     35\u001b[0m     validation_data\u001b[38;5;241m=\u001b[39m(X_test, y_test),\n\u001b[1;32m     36\u001b[0m     callbacks\u001b[38;5;241m=\u001b[39m[early_stopping],\n\u001b[1;32m     37\u001b[0m     verbose\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m1\u001b[39m\n\u001b[1;32m     38\u001b[0m )\n\u001b[1;32m     40\u001b[0m \u001b[38;5;66;03m# Save the model\u001b[39;00m\n\u001b[1;32m     41\u001b[0m model\u001b[38;5;241m.\u001b[39msave(\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mtraffic_volume_model_v2.h5\u001b[39m\u001b[38;5;124m'\u001b[39m)\n",
++      "Cell \u001b[0;32mIn[6], line 32\u001b[0m\n\u001b[1;32m     29\u001b[0m early_stopping \u001b[38;5;241m=\u001b[39m EarlyStopping(monitor\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mval_loss\u001b[39m\u001b[38;5;124m'\u001b[39m, patience\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m10\u001b[39m, restore_best_weights\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mTrue\u001b[39;00m)\n\u001b[1;32m     31\u001b[0m \u001b[38;5;66;03m# train with early stopping\u001b[39;00m\n\u001b[0;32m---> 32\u001b[0m model\u001b[38;5;241m.\u001b[39mfit(\n\u001b[1;32m     33\u001b[0m     X_train, y_train,\n\u001b[1;32m     34\u001b[0m     epochs\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m100\u001b[39m,\n\u001b[1;32m     35\u001b[0m     validation_data\u001b[38;5;241m=\u001b[39m(X_test, y_test),\n\u001b[1;32m     36\u001b[0m     callbacks\u001b[38;5;241m=\u001b[39m[early_stopping],\n\u001b[1;32m     37\u001b[0m     verbose\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m1\u001b[39m\n\u001b[1;32m     38\u001b[0m )\n\u001b[1;32m     40\u001b[0m \u001b[38;5;66;03m# Save the model\u001b[39;00m\n\u001b[1;32m     41\u001b[0m model\u001b[38;5;241m.\u001b[39msave(\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mtraffic_volume_model_v2.h5\u001b[39m\u001b[38;5;124m'\u001b[39m)\n",
+       "File \u001b[0;32m~/anaconda3/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py:117\u001b[0m, in \u001b[0;36mfilter_traceback.<locals>.error_handler\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m    115\u001b[0m filtered_tb \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;01mNone\u001b[39;00m\n\u001b[1;32m    116\u001b[0m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[0;32m--> 117\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m fn(\u001b[38;5;241m*\u001b[39margs, \u001b[38;5;241m*\u001b[39m\u001b[38;5;241m*\u001b[39mkwargs)\n\u001b[1;32m    118\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mException\u001b[39;00m \u001b[38;5;28;01mas\u001b[39;00m e:\n\u001b[1;32m    119\u001b[0m     filtered_tb \u001b[38;5;241m=\u001b[39m _process_traceback_frames(e\u001b[38;5;241m.\u001b[39m__traceback__)\n",
+       "File \u001b[0;32m~/anaconda3/lib/python3.11/site-packages/keras/src/backend/tensorflow/trainer.py:372\u001b[0m, in \u001b[0;36mTensorFlowTrainer.fit\u001b[0;34m(self, x, y, batch_size, epochs, verbose, callbacks, validation_split, validation_data, shuffle, class_weight, sample_weight, initial_epoch, steps_per_epoch, validation_steps, validation_batch_size, validation_freq)\u001b[0m\n\u001b[1;32m    370\u001b[0m callbacks\u001b[38;5;241m.\u001b[39mon_train_batch_begin(step)\n\u001b[1;32m    371\u001b[0m logs \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mtrain_function(iterator)\n\u001b[0;32m--> 372\u001b[0m callbacks\u001b[38;5;241m.\u001b[39mon_train_batch_end(step, logs)\n\u001b[1;32m    373\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mstop_training:\n\u001b[1;32m    374\u001b[0m     \u001b[38;5;28;01mbreak\u001b[39;00m\n",
+       "File \u001b[0;32m~/anaconda3/lib/python3.11/site-packages/keras/src/callbacks/callback_list.py:172\u001b[0m, in \u001b[0;36mCallbackList.on_train_batch_end\u001b[0;34m(self, batch, logs)\u001b[0m\n\u001b[1;32m    170\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_async_dispatch(\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_on_train_batch_end, batch, logs)\n\u001b[1;32m    171\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[0;32m--> 172\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_on_train_batch_end(batch, logs)\n",
+@@ -272,7 +272,7 @@
+     "scaler = StandardScaler()\n",
+     "X_scaled = scaler.fit_transform(X)\n",
+     "\n",
+-    "# Train/test split\n",
++    "# train/test split\n",
+     "X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)\n",
+     "\n",
+     "\n",
+@@ -293,7 +293,7 @@
+     "# Early stopping callback\n",
+     "early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)\n",
+     "\n",
+-    "# Train with early stopping\n",
++    "# train with early stopping\n",
+     "model.fit(\n",
+     "    X_train, y_train,\n",
+     "    epochs=100,\n",
+diff --git a/src/cost_eval_model/traffic_pred/traffic_data_prediction_us.ipynb b/src/cost_eval_model/traffic_pred/traffic_data_prediction_us.ipynb
+index 6010cba..65de8b9 100644
+--- a/src/cost_eval_model/traffic_pred/traffic_data_prediction_us.ipynb
++++ b/src/cost_eval_model/traffic_pred/traffic_data_prediction_us.ipynb
+@@ -36,7 +36,7 @@
+     "scaler = StandardScaler()\n",
+     "X_scaled = scaler.fit_transform(X)\n",
+     "\n",
+-    "# Train/test split\n",
++    "# train/test split\n",
+     "X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)\n",
+     "\n",
+     "# Build the model\n",
+@@ -48,7 +48,7 @@
+     "\n",
+     "model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n",
+     "\n",
+-    "# Train the model\n",
++    "# train the model\n",
+     "model.fit(X_train, y_train, epochs=50, validation_data=(X_test, y_test), verbose=1)\n",
+     "\n",
+     "# Predict traffic volume for Tuesday at 8AM\n",
+diff --git a/src/front_end/interface.txt b/src/front_end/interface.txt
+index fa895d0..0af68f0 100644
+--- a/src/front_end/interface.txt
++++ b/src/front_end/interface.txt
+@@ -22,7 +22,7 @@ settings: {
+ Output (to Frontend): 
+ {
+ route_segments: [
+-  { "type": "Truck", # in {"Truck", "Train", "Ship", "Plane"}
++  { "type": "truck", # in {"truck", "train", "ship", "plane"}
+     "path": [[x_1, y_1], [x_2, y_2]] # Coordinates of start and destination
+     "distance": 0, # in m
+     "duration": 0, # in s
+diff --git a/src/front_end/static/js/route_planning.js b/src/front_end/static/js/route_planning.js
+index 145bbc8..742583e 100644
+--- a/src/front_end/static/js/route_planning.js
++++ b/src/front_end/static/js/route_planning.js
+@@ -13,13 +13,13 @@ function fillRouteDetails(route) {
+     let contains_ship = false;
+     let contains_plane = false;
+     route.forEach(segment => {
+-        if (segment.type === 'Truck') {
++        if (segment.type === 'truck') {
+             contains_truck = true;
+-        } else if (segment.type === 'Train') {
++        } else if (segment.type === 'train') {
+             contains_train = true;
+-        } else if (segment.type === 'Ship') {
++        } else if (segment.type === 'ship') {
+             contains_ship = true;
+-        } else if (segment.type === 'Plane') {
++        } else if (segment.type === 'plane') {
+             contains_plane = true;
+         } 
+         duration += segment.duration;
+@@ -124,10 +124,10 @@ function loadRoute() {
+     .then(data => {
+         const segments = data.route_segments;
+         const typeColors = {
+-            "Truck": "yellow",
+-            "Train": "green",
+-            "Ship": "navy",
+-            "Plane": "red"
++            "truck": "yellow",
++            "train": "green",
++            "ship": "navy",
++            "plane": "red"
+         };
+ 
+         // Clear existing layers from the map
+diff --git a/src/front_end/templates/index.html b/src/front_end/templates/index.html
+index 2d2a407..32a0195 100644
+--- a/src/front_end/templates/index.html
++++ b/src/front_end/templates/index.html
+@@ -55,24 +55,24 @@
+                         <label class="block text-sm font-medium text-gray-700">Type of Transport:</label>
+                         <div class="mt-2 space-y-2">
+                             <div class="flex items-center">
+-                                <input id="truck" type="checkbox" name="truckCheckBox" value="Truck" checked
++                                <input id="truck" type="checkbox" name="truckCheckBox" value="truck" checked
+                                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+-                                <label for="truck" class="ml-2 block text-sm text-gray-700">Truck</label>
++                                <label for="truck" class="ml-2 block text-sm text-gray-700">truck</label>
+                             </div>
+                             <div class="flex items-center">
+-                                <input id="train" type="checkbox" name="trainCheckBox" value="Train" checked
++                                <input id="train" type="checkbox" name="trainCheckBox" value="train" checked
+                                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+-                                <label for="train" class="ml-2 block text-sm text-gray-700">Train</label>
++                                <label for="train" class="ml-2 block text-sm text-gray-700">train</label>
+                             </div>
+                             <div class="flex items-center">
+-                                <input id="ship" type="checkbox" name="shipCheckBox" value="Ship" checked
++                                <input id="ship" type="checkbox" name="shipCheckBox" value="ship" checked
+                                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+-                                <label for="ship" class="ml-2 block text-sm text-gray-700">Ship</label>
++                                <label for="ship" class="ml-2 block text-sm text-gray-700">ship</label>
+                             </div>
+                             <div class="flex items-center">
+-                                <input id="plane" type="checkbox" name="planeCheckBox" value="Plane" checked
++                                <input id="plane" type="checkbox" name="planeCheckBox" value="plane" checked
+                                 class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+-                                <label for="plane" class="ml-2 block text-sm text-gray-700">Plane</label>
++                                <label for="plane" class="ml-2 block text-sm text-gray-700">plane</label>
+                             </div>
+                         </div>
+                     </div>
+@@ -107,10 +107,10 @@
+     <div class="absolute bottom-5 left-5 bg-white/90 shadow-lg rounded-xl p-4">
+         <h3 class="text-sm font-medium text-gray-700 mb-2">Transport Legend</h3>
+         <ul class="space-y-1 text-sm text-gray-700">
+-            <li><span class="inline-block w-4 h-4 bg-yellow-300 rounded-full mr-2"></span>Truck</li>
+-            <li><span class="inline-block w-4 h-4 bg-green-700 rounded-full mr-2"></span>Train</li>
+-            <li><span class="inline-block w-4 h-4 bg-blue-800 rounded-full mr-2"></span>Ship</li>
+-            <li><span class="inline-block w-4 h-4 bg-red-500 rounded-full mr-2"></span>Plane</li>
++            <li><span class="inline-block w-4 h-4 bg-yellow-300 rounded-full mr-2"></span>truck</li>
++            <li><span class="inline-block w-4 h-4 bg-green-700 rounded-full mr-2"></span>train</li>
++            <li><span class="inline-block w-4 h-4 bg-blue-800 rounded-full mr-2"></span>ship</li>
++            <li><span class="inline-block w-4 h-4 bg-red-500 rounded-full mr-2"></span>plane</li>
+         </ul>
+     </div>
+     <div>
+diff --git a/src/planning/Planner.py b/src/planning/Planner.py
+index 5617a75..cacf5d5 100644
+--- a/src/planning/Planner.py
++++ b/src/planning/Planner.py
+@@ -14,11 +14,11 @@ class PathPlanning:
+         self.graph = None
+         self.planner = None
+ 
+-        self.loadRoadGraph("/home/louis/karaceing/road_graph_cleared_merged_exma.pkl")
++        self.loadRoadGraph("E:/road_graph_cleared_merged_exma.pkl")
+         self.idxs = [n for n in self.graph]
+         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
+ 
+-        # self.appendAirRoutes()
++        #self.appendAirRoutes()
+ 
+         self.planner = CustomPathPlanner(self.graph)
+ 
+@@ -48,7 +48,7 @@ class PathPlanning:
+                 outgoingFlights = flights[(flights['Dept Station'] == airport) & (flights['Arr Station'] == airport2)]
+                 for row in outgoingFlights.itertuples():
+                     attrs = {
+-                        "type": "air",
++                        "type": "plane",
+                         "startTime": row["ETD (Zulu)"],
+                         "endTime": row["ETA (Zulu)"],
+                         "length": math.dist((self.graph.nodes[matchedNodes[i]]["x"],self.graph.nodes[matchedNodes[i]]["y"],
+diff --git a/src/planning/customPathPlanner.py b/src/planning/customPathPlanner.py
+index ec769dd..92fb2f2 100644
+--- a/src/planning/customPathPlanner.py
++++ b/src/planning/customPathPlanner.py
+@@ -24,12 +24,12 @@ class CustomPathPlanner:
+             "origin": { 
+                 "lat": 0,
+                 "lng": 0
+-                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
++                "mode_prior_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "destination": {
+                 "lat": 0,
+                 "lng": 0,
+-                "mode_next_edge": | "train" | "ship" | "truck" | "air"
++                "mode_next_edge": | "train" | "ship" | "truck" | "plane"
+             },
+             "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
+             "max_speed_next_edge": 0, [km/h]
+@@ -37,21 +37,24 @@ class CustomPathPlanner:
+             "distance_mode_start_next_edge": 0, [km]
+             "time_prior_edge_end": 0, 
+         } """
+-        data["origin"]["lat"] = self.G.nodes[u]['y']
+-        data["origin"]["lng"] = self.G.nodes[u]['x']
+-        data["origin"]["mode_prior_edge"] = data.get("type", "Truck")
+-        data["destination"]["lat"] = self.G.nodes[v]['y']
+-        data["destination"]["lng"] = self.G.nodes[v]['x']
+-        data["destination"]["mode_next_edge"] = previous_edge_data[u].get("type", "Truck")
+-        data["highway"] = data.get("highway", "motorway")
+-        data["max_speed_next_edge"] = data.get("max_speed", 0)
+-        data["distance_next_edge"] = data.get("length", 0) / 1000  # Convert to km
+-        data["distance_mode_start_next_edge"] = path_of_type.get("length", 0) / 1000  # Convert to km
+-        data["time_prior_edge_end"] = current_time
+-        data["time_next_edge_end"] = current_time 
++        data_dict = {}
++        data_dict["origin"] = {}
++        data_dict["destination"] = {}
++        data_dict["origin"]["lat"] = self.G.nodes[u]['y']
++        data_dict["origin"]["lng"] = self.G.nodes[u]['x']
++        data_dict["origin"]["mode_prior_edge"] = data.get("type", "truck")
++        data_dict["destination"]["lat"] = self.G.nodes[v]['y']
++        data_dict["destination"]["lng"] = self.G.nodes[v]['x']
++        data_dict["destination"]["mode_next_edge"] = previous_edge_data.get("type", "truck")
++        data_dict["highway"] = data.get("highway", "motorway")
++        data_dict["max_speed_next_edge"] = 80
++        data_dict["distance_next_edge"] = data.get("length", 0) / 1000  # Convert to km
++        data_dict["distance_mode_start_next_edge"] = path_of_type.get("length", 0) / 1000  # Convert to km
++        data_dict["time_prior_edge_end"] = current_time
++        data_dict["time_next_edge_end"] = current_time 
+ 
+         base_cost = data.get("length", 1)
+-        custom_costs = self.cost_api.get_cost(data)
++        custom_costs = self.cost_api.get_cost(data_dict)
+         return custom_costs  # Default to base cost if not found
+ 
+     def get_travel_time(self, u, v, data, current_time):
+@@ -147,7 +150,7 @@ class CustomPathPlanner:
+                     f_score[neighbor] = tentative_g_score + heuristic_cost
+                     times[neighbor] = times[current] + costs.get("time_cost", 0)
+ 
+-                    transport_mode = edge_data.get("type", "Truck")
++                    transport_mode = edge_data.get("type", "truck")
+                     mode_of_transport[neighbor] = transport_mode
+ 
+                     if transport_mode == mode_of_transport[current]:
+diff --git a/src/planning/pathPlanner.py b/src/planning/pathPlanner.py
+index 642ce31..fed9a8c 100644
+--- a/src/planning/pathPlanner.py
++++ b/src/planning/pathPlanner.py
+@@ -29,5 +29,5 @@ class PathPlanner:
+         v_point = (self.graph.nodes[v]['x'], self.graph.nodes[v]['y'])
+         return self.haversine(*u_point, *v_point)
+ 
+-    def calculate_path(self, orig, dest):
++    def calculate_path(self, orig, dest, settings):
+         return astar_path(self.graph, orig, dest, heuristic=self.heuristic, weight=self.custom_cost)
+\ No newline at end of file

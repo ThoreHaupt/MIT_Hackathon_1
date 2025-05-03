@@ -14,11 +14,11 @@ class PathPlanning:
         self.graph = None
         self.planner = None
 
-        self.loadRoadGraph("/home/louis/karaceing/road_graph_cleared_merged_exma.pkl")
+        self.loadRoadGraph("E:/road_graph_cleared_merged_exma.pkl")
         self.idxs = [n for n in self.graph]
         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
 
-        # self.appendAirRoutes()
+        #self.appendAirRoutes()
 
         self.planner = CustomPathPlanner(self.graph)
 
@@ -48,7 +48,7 @@ class PathPlanning:
                 outgoingFlights = flights[(flights['Dept Station'] == airport) & (flights['Arr Station'] == airport2)]
                 for row in outgoingFlights.itertuples():
                     attrs = {
-                        "type": "air",
+                        "type": "plane",
                         "startTime": row["ETD (Zulu)"],
                         "endTime": row["ETA (Zulu)"],
                         "length": math.dist((self.graph.nodes[matchedNodes[i]]["x"],self.graph.nodes[matchedNodes[i]]["y"],
