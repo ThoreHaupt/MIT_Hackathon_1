@@ -1,6 +1,9 @@
 *.xml
 *.csv
 
+# exeption for plz_data_total.csv
+!plz_data_total.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
