@@ -19,7 +19,7 @@ class PriceCostModel(CostModel):
         """
         edge_cost = 0
         dist_in_km = data["distance_next_edge"]
-        data["dist_mode_start_next_edge"] += dist_in_km
+        # data["dist_mode_start_next_edge"] += dist_in_km
         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
             if data["origin"]["mode_next_edge"] == 'train':
                 edge_cost = us_price_rail_per_km_per_ton*dist_in_km

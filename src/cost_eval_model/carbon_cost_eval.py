@@ -19,7 +19,7 @@ class CarbonCostModel(CostModel):
         """
         carbon_cost = 0
         dist_in_km = data["distance_next_edge"]
-        data["dist_mode_start_next_edge"] += dist_in_km # brauche ich das ueberhaupt
+        # data["dist_mode_start_next_edge"] += dist_in_km
         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
             if data["origin"]["mode_next_edge"] == 'train':
                 carbon_cost = carbon_rail_per_km_per_ton * dist_in_km
