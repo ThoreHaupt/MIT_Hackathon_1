@@ -126,4 +126,4 @@ def parse_to_connections(start, connections):
 def get_connections(start, target, time=datetime.now()):
     return parse_to_connections(start, get_connection(get_eva_id(start), target, time))
 
-print(get_connections("Karlsruhe HBF", "Konstanz", datetime.now())[0])
+# print(get_connections("Karlsruhe HBF", "Konstanz", datetime.now())[0])

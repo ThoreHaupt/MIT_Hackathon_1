@@ -4,6 +4,9 @@ from scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
 from scraping.airplane_data.getAirports import getAirportsAsDict
 from scraping.traffic_data.traffic_issues import traffic_issues
 
+import scraping.train_data.scarpeTrainStations as ts
+import scraping.train_data.scrapeTrainData as train_data
+
 
 def get_ship_data(locationStart, locationTaget):
     return {
@@ -30,7 +33,7 @@ def unavailabe_edges():
     return [1, 1232, 12322, 23231]
 
 def get_train_stations():
-    return ["Berlin", "Karlsruhe", "Hamburg"]
+    return ts.get_all_train_stations()
 
 def get_airports():
     return getAirportsAsDict()
@@ -41,8 +44,8 @@ def get_ships():
 def ship_available(locationStart, locationTaget):
     return True
 
-def train_available(locationStart, locationTaget):
-    return True
+def train_available(locationStart, time = datetime.datetime.now()):
+    return train_data.get_connections(locationStart, time)
 
 def flight_available(locationStart, locationTaget):
     return True
