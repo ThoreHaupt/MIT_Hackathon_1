@@ -1,5 +1,5 @@
 import datetime
-from scraping.WetterEnum import WeatherCondition
+from scraping.wetter_data.WetterEnum import WeatherCondition
 from scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
 from scraping.airplane_data.getAirports import getAirportsAsDict
 from scraping.traffic_data.traffic_issues import traffic_issues
