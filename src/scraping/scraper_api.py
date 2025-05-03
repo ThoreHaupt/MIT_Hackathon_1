@@ -1,5 +1,7 @@
 import datetime
 import WetterEnum
+from src.scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
+from src.scraping.airplane_data.getAirports import getAirportsAsDict
 from src.scraping.traffic_data.traffic_issues import traffic_issues
 
 
@@ -31,7 +33,7 @@ def get_train_stations():
     return ["Berlin", "Karlsruhe", "Hamburg"]
 
 def get_airports():
-    return ["Berlin", "Karlsruhe", "Hamburg"]
+    return getAirportsAsDict()
 
 def get_ships():
     return ["Berlin", "Karlsruhe", "Hamburg"]
@@ -50,4 +52,8 @@ def get_traffic_issues():
 
 def get_construction_data():
     return get_construction_data()
+
+def get_flights():
+    return AtlasAirScraper().getData()
+
 
