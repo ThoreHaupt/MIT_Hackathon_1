@@ -52,15 +52,13 @@ function loadRoute() {
     formData.append('riskImportance', document.getElementById('risk-slider').value);
     formData.append('freightWeight', freightWeight.value);
     formData.append('freightSize', freightSize.value);
-    console.log("Form data:", formData);
 
-    fetch('http://localhost:5000/route', {
-        method: 'POST',
-        body: formData
-    })
+        fetch('http://localhost:5000/route', {
+            method: 'POST',
+            body: formData
+        })
     .then(response => response.json())
     .then(data => {
-        console.log("Traffic issues data:", data);
         const segments = data.route_segments;
         const typeColors = {
             "Truck": "blue",
@@ -120,35 +118,6 @@ function loadRoute() {
         L.marker(segments[0].path[0]).addTo(map).bindPopup("Start").openPopup();
         L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
 
-        
-        const traffic_issue_icon = L.icon({
-            iconUrl: 'static/resources/traffic_issue.png',
-            iconSize: [30, 30],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-        });
-
-        const construction_site_icon = L.icon({
-            iconUrl: 'static/resources/construction_site.png',
-            iconSize: [30, 30],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-        });
-
-        // Add traffic issues markers
-        data.traffic_issues.forEach(issue => {
-            L.marker([issue.latitude, issue.longitude], { icon: traffic_issue_icon })
-                .addTo(map)
-                .bindPopup(`Traffic Issue: ${issue.description}`);
-        });
-
-        // Add construction sites markers
-        data.construction_sites.forEach(site => {
-            L.marker([site.latitude, site.longitude], { icon: construction_site_icon })
-                .addTo(map)
-                .bindPopup(`Construction Site: ${site.description}`);
-        });
-
         // Adjust map view to fit all segments
         const allCoordinates = segments.flatMap(segment => segment.path);
         const bounds = L.latLngBounds(allCoordinates);
@@ -157,4 +126,72 @@ function loadRoute() {
     .catch(error => console.error('Error fetching route:', error));
 }
 
+function loadTrafficIssues() {
+    const active = document.getElementById('trafficIssues').checked;
+    // Remove traffic issues markers
+    map.eachLayer(layer => {
+        if (layer.options && layer.options.icon && layer.options.icon.options.iconUrl === 'static/resources/traffic_issue.png') {
+            map.removeLayer(layer);
+        }
+    });
+    if (!active) {
+        return;
+    }
+    // Fetch traffic issues from the server
+    fetch('http://localhost:5000/traffic_issues_request', {
+        method: 'POST',
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Add traffic issues markers
+            const traffic_issue_icon = L.icon({
+                iconUrl: 'static/resources/traffic_issue.png',
+                iconSize: [30, 30],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+            });
+            data.forEach(issue => {
+                L.marker([issue.latitude, issue.longitude], { icon: traffic_issue_icon })
+                    .addTo(map)
+                    .bindPopup(`Traffic Issue: ${issue.description}`);
+            });
+        })
+        .catch(error => console.error('Error fetching traffic issues:', error));
+}
+function loadConstructionSites() {
+    const active = document.getElementById('constructionSites').checked;
+    // Remove construction sites markers
+    map.eachLayer(layer => {
+        if (layer.options && layer.options.icon && layer.options.icon.options.iconUrl === 'static/resources/construction_site.png') {
+            map.removeLayer(layer);
+        }
+    });
+    if (!active) {
+        return;
+    }
+    // Fetch construction sites from the server
+    fetch('http://localhost:5000/construction_sites_request', {
+        method: 'POST',
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Add construction sites markers
+            const construction_site_icon = L.icon({
+                iconUrl: 'static/resources/construction_site.png',
+                iconSize: [30, 30],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+            });
+            data.forEach(site => {
+                L.marker([site.latitude, site.longitude], { icon: construction_site_icon })
+                    .addTo(map)
+                    .bindPopup(`Construction Site: ${site.description}`);
+            });
+        })
+        .catch(error => console.error('Error fetching construction sites:', error));
+}
+
+
 window.loadRoute = loadRoute;
+window.loadTrafficIssues = loadTrafficIssues;
+window.loadConstructionSites = loadConstructionSites;

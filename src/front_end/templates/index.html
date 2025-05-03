@@ -107,7 +107,42 @@
             <li><span class="inline-block w-4 h-4 bg-red-500 rounded-full mr-2"></span>Plane</li>
         </ul>
     </div>
+    <div>
+        <div class="absolute bottom-5 left-44 bg-white/90 shadow-lg rounded-xl p-4">
+            <div class="flex items-center">
+                <input id="trafficIssues" type="checkbox" name="trafficIssues" value="Traffic Issues" onclick="toggleTrafficIssuesImage(this)"
+                class="hidden">
+                <label for="trafficIssues" class="cursor-pointer">
+                    <img id="trafficIssuesImage" src="/static/resources/traffic_issue_bw.png" alt="Traffic Issues" class="w-6 h-6">
+                </label>
+                <!-- <span class="ml-2 block text-sm text-gray-700">Consider Traffic Issues</span> -->
+            </div>
+        </div>
+        <div class="absolute bottom-5 left-60 bg-white/90 shadow-lg rounded-xl p-4">
+            <div class="flex items-center">
+                <input id="constructionSites" type="checkbox" name="constructionSites" value="Construction Sites" onclick="toggleConstructionSitesImage(this)"
+                class="hidden">
+                <label for="constructionSites" class="cursor-pointer">
+                    <img id="constructionSitesImage" src="/static/resources/construction_site_bw.png" alt="Construction Sites" class="w-6 h-6">
+                </label>
+                <!-- <span class="ml-2 block text-sm text-gray-700">Consider Construction Sites</span> -->
+            </div>
+        </div>
 
+        <script>
+            function toggleTrafficIssuesImage(checkbox) {
+                const img = document.getElementById('trafficIssuesImage');
+                img.src = checkbox.checked ? '/static/resources/traffic_issue.png' : '/static/resources/traffic_issue_bw.png';
+                loadTrafficIssues();
+            }
+
+            function toggleConstructionSitesImage(checkbox) {
+                const img = document.getElementById('constructionSitesImage');
+                img.src = checkbox.checked ? '/static/resources/construction_site.png' : '/static/resources/construction_site_bw.png';
+                loadConstructionSites();
+            }
+        </script>
+    </div>
 
     
     <script src="/static/js/map.js" type="module"></script>

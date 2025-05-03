@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from .path_planner import plan_route  # Placeholder for your logic
 from .address_to_coord_converter import geocode_address  # Placeholder for your logic
+from scraping.traffic_data.traffic_issues import traffic_issues, get_construction_data
 
 app = Flask(__name__)
 CORS(app)
@@ -31,6 +32,17 @@ def route():
 
     route_data = plan_route({"name": start, "coords": start_coords}, {"name": destination, "coords": destination_coords}, settings)
     return jsonify(route_data)
+
+
+@app.route('/traffic_issues_request', methods=['POST'])
+def traffic_issues_request():
+    traffic_issues_data = [issue.to_dict() for issue in traffic_issues()]
+    return jsonify(traffic_issues_data)
+
+@app.route('/construction_sites_request', methods=['POST'])
+def construction_sites_request():
+    construction_data = [site.to_dict() for site in get_construction_data()]
+    return jsonify(construction_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

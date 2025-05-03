@@ -42,6 +42,4 @@ def plan_route(start, destination, settings):
             "co2_emissions": 200,
         }
         ],
-        "traffic_issues": traffic_issues_data,
-        "construction_sites": construction_sites_data,
     }
