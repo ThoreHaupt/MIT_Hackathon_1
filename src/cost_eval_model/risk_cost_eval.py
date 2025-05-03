@@ -25,7 +25,7 @@ class RiskCostModel(CostModel):
         self.scaler = StandardScaler()
         
 
-    def evaluate(self, data, construction_manager: ConstructionManager):
+    def evaluate(self, data, construction_manager: ConstructionManager, settings: dict):
         """
         Evaluate the risk cost of the model on the given data.
 
@@ -51,10 +51,37 @@ class RiskCostModel(CostModel):
             "time_prior_edge_end": 0, 
         }
 
+        settings: {
+            "use_truck": true, # boolean
+            "use_train": true, # boolean
+            "use_ship": true, # boolean
+            "use_plane": true, # boolean
+            "weight_time": 0, # Int in [0..10]
+            "weight_co2": 0, # Int in [0..10]
+            "weight_money": 0, # Int in [0..10]
+            "weight_risk": 0, # Int in [0..10]
+            "freight_weight": 0, # double
+            "freight_size": 0, # double
+            }
+
+
         """
 
         risk_score = 0
         # Placeholder for actual evaluation logic
+
+        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+            risk_score = 1000
+            return risk_score
+        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+            risk_score = 1000
+            return risk_score
+        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+            risk_score = 1000
+            return risk_score
+        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+            risk_score = 1000
+            return risk_score
 
          # in case of truck,truck and truck is on highway we need to check if there is a construction site
         if data['origin']['mode_prior_edge'] == 'truck' and data['destination']['mode_next_edge'] == 'truck' and data['highway'] in ['motorway', 'trunk']:

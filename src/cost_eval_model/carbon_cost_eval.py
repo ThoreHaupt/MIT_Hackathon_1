@@ -11,13 +11,27 @@ class CarbonCostModel(CostModel):
     def __init__(self, carbon_model):
         self.carbon_model = carbon_model
 
-    def evaluate(self, data):
+    def evaluate(self, data, settings: dict):
         """
         Evaluate the cost of the carbon model.
         :param data: The data to evaluate the model on.
         :return: The cost of the model.
         """
         carbon_cost = 0
+        
+        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+            carbon_cost = 1000
+            return carbon_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+            carbon_cost = 1000
+            return carbon_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+            carbon_cost = 1000
+            return carbon_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+            carbon_cost = 1000
+            return carbon_cost
+        
         dist_in_km = data["distance_next_edge"]
         # data["dist_mode_start_next_edge"] += dist_in_km
         if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:

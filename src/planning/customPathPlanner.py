@@ -52,7 +52,7 @@ class CustomPathPlanner:
 
         base_cost = data.get("length", 1)
         custom_costs = self.cost_api.get_cost(data)
-        return custom_costs.get("cost", base_cost)  # Default to base cost if not found
+        return custom_costs.get("total_cost", base_cost)  # Default to base cost if not found
 
     def get_travel_time(self, u, v, data, current_time):
         return 1
@@ -85,7 +85,9 @@ class CustomPathPlanner:
         self.cost_api.set_carbon_weight(settings["weight_co2"])
         self.cost_api.set_travel_time_weight(settings["weight_time"])
         self.cost_api.set_risk_weight(settings["weight_risk"])
-        
+
+
+
         if orig == dest:
             return []  # Edge case: origin is the same as destination
 

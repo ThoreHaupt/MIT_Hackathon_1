@@ -20,7 +20,7 @@ class CostAPI:
 
         self.weight = weight
         self.size = size
-
+        self.settings = {}
 
         self.construction_site_data = get_construction_site_data() # returns a list of dicts with lat, lng, and other data
         self.construction_manager = ConstructionManager(self.construction_site_data)
@@ -58,6 +58,15 @@ class CostAPI:
         self.risk_weight = value
         return self.risk_weight
     
+    def set_settings(self, settings:dict):
+        """
+        Set the settings for the cost API.
+        """
+        self.weight_price = settings["weight_money"]
+        self.carbon_weight = settings["weight_co2"]
+        self.travel_time_weight = settings["weight_time"]
+        self.risk_weight = settings["weight_risk"]
+        self.settings = settings
 
     def get_cost(self, edge_data:dict) -> dict:
         """
@@ -86,12 +95,11 @@ class CostAPI:
         """
         # Extract the data from the edge_data
 
-
         
-        price_cost = self.price_model.evaluate(edge_data) 
-        carbon_cost = self.carbon_model.evaluate(edge_data)
-        time_cost = self.time_model.evaluate(edge_data, self.construction_manager)
-        risk_cost = self.risk_model.evaluate(edge_data, self.construction_manager)
+        price_cost = self.price_model.evaluate(edge_data, self.settings) 
+        carbon_cost = self.carbon_model.evaluate(edge_data, self.settings)
+        time_cost = self.time_model.evaluate(edge_data, self.construction_manager, self.settings)
+        risk_cost = self.risk_model.evaluate(edge_data, self.construction_manager, self.settings)
 
         # Calculate the cost
         cost = (self.weight_price * price_cost + 

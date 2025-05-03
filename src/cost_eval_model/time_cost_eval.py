@@ -6,7 +6,7 @@ class TimeCostModel(CostModel):
     def __init__(self, time_cost):
         self.time_cost = time_cost
 
-    def evaluate(self, data, construction_manager, transport_time_api):
+    def evaluate(self, data, construction_manager, transport_time_api, settings: dict):
 
         """
         Calculate the time per km for each transport type.
@@ -15,6 +15,19 @@ class TimeCostModel(CostModel):
         # in case of truck,truck and truck is on highway we need to check if there is a construction site
         # current_time = data["time_prior_edge_end"]
         time_cost = 0
+
+        if data['destination']['mode_next_edge'] == data.get("type", "Truck") and not settings.get("use_truck", True):
+            time_cost = 1000
+            return time_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Ship") and not settings.get("use_ship", True):
+            time_cost = 1000
+            return time_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Train") and not settings.get("use_train", True):
+            time_cost = 1000
+            return time_cost
+        if data['origin']['mode_prior_edge'] == data.get("type", "Air") and not settings.get("use_plane", True):
+            time_cost = 1000
+            return time_cost
 
         if data['origin']['mode_prior_edge'] == 'truck' and data['destination']['mode_next_edge'] == 'truck' and data['highway'] in ['motorway', 'trunk']:
             construction = construction_manager.get_construction(data['origin']['lat'], data['origin']['lng'])
