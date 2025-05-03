@@ -1,9 +1,8 @@
 
-from src import planning
+import planning
 
-
+planner = planning.PathPlanning()
 def plan_route(start, destination, settings):
-    planner = planning.PathPlanning()
     print("planning path")
     path = planner.plan(start["coords"], destination["coords"])
 

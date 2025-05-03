@@ -1,16 +1,10 @@
 import math
 
 import osmnx as ox
-import networkx as nx
 import pickle
-from pyrosm import OSM
 
 from planning.customPathPlanner import CustomPathPlanner
-#import pathPlanner
-#import customPathPlanner
 from scraping import scraper_api
-from multiprocessing import Pool
-import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 
 
@@ -20,7 +14,7 @@ class PathPlanning:
         self.graph = None
         self.planner = None
 
-        self.loadRoadGraph("/media/nils/Nils_Data/MIT-Hackathon/road_graph_autobahn_cleared.pkl")
+        self.loadRoadGraph("/media/louis/T7/road_graph_autobahn_cleared.pkl")
         self.idxs = [n for n in self.graph]
         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
 
@@ -61,16 +55,12 @@ class PathPlanning:
                                             (self.graph.nodes[matchedNodes[j]]["x"],self.graph.nodes[matchedNodes[j]]["y"])))
                     }
                     self.graph.add_edge(matchedNodes[i], matchedNodes[j], **attrs)
-                    print("added flight ", attrs)
 
     def plan(self, origin, destination):
-        print(origin, destination)
 
         start = ox.nearest_nodes(self.graph, origin[1], origin[0])
         end  = ox.nearest_nodes(self.graph, destination[1], destination[0])
 
-        print(f"start: {start}, end: {end}")
-        print(f"{self.graph.nodes[start]} -> {self.graph.nodes[end]}")
         path = self.planner.calculate_path(start, end)
 
 
