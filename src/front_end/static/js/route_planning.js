@@ -1,9 +1,47 @@
 import { map } from './map.js';
 
 function loadRoute() {
+    const origin = document.getElementById('origin');
+    const destination = document.getElementById('destination');
+    const freightWeight = document.getElementById('freightWeight');
+    const freightSize = document.getElementById('freightSize');
+
+    // Validation checks with interactive warnings
+    if (!origin.value) {
+        origin.setCustomValidity('Origin cannot be empty.');
+        origin.reportValidity();
+        return;
+    } else {
+        origin.setCustomValidity('');
+    }
+
+    if (!destination.value) {
+        destination.setCustomValidity('Destination cannot be empty.');
+        destination.reportValidity();
+        return;
+    } else {
+        destination.setCustomValidity('');
+    }
+
+    if (!freightSize.value) {
+        freightSize.setCustomValidity('Freight size cannot be empty.');
+        freightSize.reportValidity();
+        return;
+    } else {
+        freightSize.setCustomValidity('');
+    }
+
+    if (!freightWeight.value) {
+        freightWeight.setCustomValidity('Freight weight cannot be empty.');
+        freightWeight.reportValidity();
+        return;
+    } else {
+        freightWeight.setCustomValidity('');
+    }
+
     const formData = new FormData();
-    formData.append('origin', document.getElementById('origin').value);
-    formData.append('destination', document.getElementById('destination').value);
+    formData.append('origin', origin.value);
+    formData.append('destination', destination.value);
     formData.append('truckCheckBox', document.getElementById('truck').checked ? 'on' : '');
     formData.append('trainCheckBox', document.getElementById('train').checked ? 'on' : '');
     formData.append('shipCheckBox', document.getElementById('ship').checked ? 'on' : '');
@@ -12,8 +50,8 @@ function loadRoute() {
     formData.append('co2Importance', document.getElementById('co2-slider').value);
     formData.append('moneyImportance', document.getElementById('money-slider').value);
     formData.append('riskImportance', document.getElementById('risk-slider').value);
-    formData.append('freightWeight', document.getElementById('freightWeight').value);
-    formData.append('freightSize', document.getElementById('freightSize').value);
+    formData.append('freightWeight', freightWeight.value);
+    formData.append('freightSize', freightSize.value);
     console.log("Form data:", formData);
 
     fetch('http://localhost:5000/route', {
