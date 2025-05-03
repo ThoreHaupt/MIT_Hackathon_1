@@ -1,0 +1,32 @@
+Frontend path route interface:
+
+Input (from Frontend):
+
+plan_route(origin, destination, settings) where
+
+origin: {"name": <origin_name>, "coords": <origin_coords>}
+destination: {"name": <origin_name>, "coords": <destination_coords>}
+settings: {
+  "use_truck": true, # boolean
+  "use_train": true, # boolean
+  "use_ship": true, # boolean
+  "use_plane": true, # boolean
+  "weight_time": 0, # Int in [0..10]
+  "weight_co2": 0, # Int in [0..10]
+  "weight_money": 0, # Int in [0..10]
+  "weight_risk": 0, # Int in [0..10]
+  "freight_weight": 0, # double
+  "freight_size": 0, # double
+}
+
+Output (to Frontend): 
+{
+route_segments: [
+  { "type": "Truck", # in {"Truck", "Train", "Ship", "Plane"}
+    "path": [[x_1, y_1], [x_2, y_2]] # Coordinates of origin and destination
+    "distance": 0, # in m
+    "duration": 0, # in s
+    "cost": 0, # in s
+    "co2_emissions": 0, # in CO₂e
+  }, ...] #List of following segment points
+}
