@@ -1,37 +1,30 @@
 from flask import Flask, render_template, request, jsonify
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from flask_cors import CORS
+from path_planner import plan_route  # Placeholder for your logic
+from address_to_coord_converter import geocode_address  # Placeholder for your logic
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        # Get form data
-        start_point = request.form.get('start_point')
-        end_point = request.form.get('end_point')
-        time_weight = float(request.form.get('time_weight', 1))
-        cost_weight = float(request.form.get('cost_weight', 1))
-        carbon_weight = float(request.form.get('carbon_weight', 1))
-        product_type = request.form.get('product_type')
+    return render_template('index.html', route=None)
 
-        # Here we'll add the logic to calculate routes and costs
-        # For now, we'll just return the input data
-        return jsonify({
-            'start': start_point,
-            'end': end_point,
-            'weights': {
-                'time': time_weight,
-                'cost': cost_weight,
-                'carbon': carbon_weight
-            },
-            'product': product_type
-        })
+@app.route('/route', methods=['POST'])
+def route():
+    origin = request.form.get('origin')
+    destination = request.form.get('destination')
+    origin_coords = geocode_address(origin)
+    destination_coords = geocode_address(destination)
+    settings = {
+        "useTruck": request.form.get('truckCheckBox') == 'on',
+        "useTrain": request.form.get('trainCheckBox') == 'on',
+        "useShip": request.form.get('shipCheckBox') == 'on',
+        "usePlane": request.form.get('airCheckBox') == 'on',
+    }
 
-    return render_template('index.html')
+    route_data = plan_route({"name": origin, "coords": origin_coords}, {"name": destination, "coords": destination_coords}, settings)
+    return jsonify(route_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
