@@ -14,10 +14,6 @@ class CustomPathPlanner:
     # Custom edge cost function
     def custom_cost(self, u, v, data, current_time):
         base_cost = data.get("length", 1)
-        if data.get("highway") in ["motorway", "trunk"]:
-            base_cost *= 2  # Penalize motorways
-        if data.get("tunnel"):
-            base_cost *= 3  # Strongly penalize tunnels
         return base_cost
 
     def get_travel_time(self, u, v, data, current_time):
@@ -52,7 +48,7 @@ class CustomPathPlanner:
         heapq.heappush(open_list, (0, orig))
         came_from = {orig:None}
         path_of_type = {orig: 0}
-        mode_of_transport = {orig: None}
+        mode_of_transport = {orig: "None"}
         g_score = {orig: 0}
         segCost = {orig: None}
         times = {orig: current_time}
@@ -69,8 +65,8 @@ class CustomPathPlanner:
                 path = []
                 while current in came_from:
 
-                    segment = { "type": mode_of_transport[current], # in {"Truck", "Train", "Ship", "Plane"}
-                                "path": [[self.G.nodes[current]['y'], self.G.nodes[current]['x']], [[self.G.nodes[last]['y'], self.G.nodes[last]['x']]]], # Coordinates of start and destination
+                    segment = { "type": mode_of_transport[last], # in {"Truck", "Train", "Ship", "Plane"}
+                                "path": [[self.G.nodes[current]['y'], self.G.nodes[current]['x']], [self.G.nodes[last]['y'], self.G.nodes[last]['x']]], # Coordinates of start and destination
                                 "distance": segCost[last]["distance"], # in m
                                 "duration": segCost[last]["duration"], # in s
                                 "cost": segCost[last]["cost"], # in s
@@ -86,13 +82,16 @@ class CustomPathPlanner:
                 tentative_g_score = g_score[current] + self.custom_cost(current, neighbor, self.G[current][neighbor],
                                                                    times[current])
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                    print(self.G.nodes[current]['y'] - self.G.nodes[neighbor]['y'],
+                          self.G.nodes[current]['x'] - self.G.nodes[neighbor]['x'])
+
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = g_score[neighbor] + self.heuristic(neighbor, dest)
                     times[neighbor] = current_time + timedelta(seconds=self.get_travel_time(current, neighbor, self.G[current][neighbor],
                                                                    times[current]))
                     # detect mode of transport
-                    mode_of_transport[neighbor] = self.G[current][neighbor].get("type", "road")
+                    mode_of_transport[neighbor] = self.G[current][neighbor].get("type", "Truck")
                     if mode_of_transport[neighbor] == mode_of_transport[current]:
                         path_of_type[neighbor] = path_of_type[current] + self.G[current][neighbor].get("length", 0)
                     else:

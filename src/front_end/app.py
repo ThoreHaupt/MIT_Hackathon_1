@@ -15,8 +15,8 @@ def index():
 def route():
     start = request.form.get('start')
     destination = request.form.get('destination')
-    start_coords = [51.51152244586142, -0.11945285580050813] #geocode_address(start)
-    destination_coords = [47.60407666445795, 12.986876363537341] #geocode_address(destination)
+    start_coords = geocode_address(start)
+    destination_coords = geocode_address(destination)
     settings = {
         "use_truck": request.form.get('truckCheckBox') == 'on',
         "use_train": request.form.get('trainCheckBox') == 'on',

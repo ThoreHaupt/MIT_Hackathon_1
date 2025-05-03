@@ -6,54 +6,35 @@ class TimeCostModel(CostModel):
     def __init__(self, time_cost):
         self.time_cost = time_cost
 
-    def evaluate(self, data):
+    def evaluate(self, data, construction_manager, transport_time_api):
 
         """
         Calculate the time per km for each transport type.
         """
-        # same mode
-        #   cost = dependent on mode
-        #           => distance * cost
-        #           dist_mode_start_next_edge += dist
-        # not same mode (for time => add 2 Stunden)
-        # speed?
-        edge_time = 0
-        dist_in_km = data["distance_next_edge"]
-        data["dist_mode_start_next_edge"] += data["time_prior_edge_end"]
 
-        if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
-            if data["origin"]["mode_next_edge"] == 'train':
-                edge_time = dist_in_km * 1/max_speed_train
-            elif data["origin"]["mode_next_edge"] == 'air':
-                edge_time = dist_in_km * 1/max_speed_air
-            elif data["origin"]["mode_next_edge"] == 'truck':
-                edge_time = dist_in_km * 1/max_speed_truck
-            elif data['origin']['mode_next_edge'] == "ship":
-                edge_time = dist_in_km * 1/max_speed_ship
-        else:
-            edge_time = 2
+        # in case of truck,truck and truck is on highway we need to check if there is a construction site
+        # current_time = data["time_prior_edge_end"]
+        time_cost = 0
 
-        return edge_time
+        if data['origin']['mode_prior_edge'] == 'truck' and data['destination']['mode_next_edge'] == 'truck' and data['highway'] in ['motorway', 'trunk']:
+            construction = construction_manager.get_construction(data['origin']['lat'], data['origin']['lng'])
+            if construction:
+                time_cost += construction["estimatedTimeLoss"]
 
-    """
-        edge_data:
-        {
-            "origin": {
-                          "lat": 0,
-                          "lng": 0
-                          "mode_prior_edge": | "train" | "ship" | "truck" | "air"
-        },
-        "destination": {
-                           "lat": 0,
-                           "lng": 0,
-                           "mode_next_edge": | "train" | "ship" | "truck" | "air"
-        },
-        "highway": 
-                        "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
-                                                                    "max_speed_next_edge": 0,
-        "distance_next_edge": 0,
-        "distance_mode_start_next_edge": 0,
-        "time_prior_edge_end": 0,
-        }
+            time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
 
-        """
+        if data['origin']['mode_prior_edge'] == data['destination']['mode_next_edge']:
+            time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
+
+        # calculate the time if we have to switch
+        if data['origin']['mode_prior_edge'] != data['destination']['mode_next_edge']:
+            # fetch wait time from
+            #next_leave_time = transport_time_api.get_next_departure_time(data['origin']['lat'], data['origin']['lng'], data['destination']['lat'], data['destination']['lng'], data['origin']['mode_prior_edge'], data['destination']['mode_next_edge'])
+            #wait_time = next_leave_time - current_time
+            if data['origin']['mode_next_edge'] == 'air':
+                time_cost = data["time_next_edge_end"] - data["time_prior_edge_end"]
+            else:
+                wait_time = 3
+                time_cost += wait_time
+
+        return time_cost

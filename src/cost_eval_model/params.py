@@ -4,6 +4,7 @@ max_speed_truck = 80 # km/h
 max_speed_air = 800 # km/h
 
 PLZ_DATA_PATH = "MIT_Hackathon_1/src/cost_eval_model/traffic_pred/plz_data_total.csv"
+KERAS_MODEL_PATH = "MIT_Hackathon_1/src/cost_eval_model/traffic_pred/traffic_volume_model_v2.keras"
 
 us_price_rail_per_km_per_ton = 0.28 # USD
 us_price_truck_per_km_per_truck = 4.38 # USD
@@ -18,4 +19,3 @@ carbon_rail_per_km_per_ton = 0.015 # kg
 carbon_truck_per_km_per_ton = 0.119 # kg
 carbon_ship_per_km_per_ton = 0.034 # kg
 carbon_air_per_km_per_ton = 0.500 # kg
-

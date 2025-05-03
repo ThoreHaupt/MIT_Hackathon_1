@@ -1,17 +1,32 @@
 from cost_eval_model.params import *
 
 import pandas as pd
-
+from collections import defaultdict
+import numpy as np
 
 class CostModel:
     
     plz_data = pd.read_csv(PLZ_DATA_PATH) # plz;lat;lng;inhab_plz;density;inhab_100
+    buckets = defaultdict(list)
+    bucket_size = 0.1  # Adjust based on desired granularity (degrees)
 
     def __init__(self):
         # load the html data
         pass
 
-    def get_plz_data(lat, long):
+
+    @classmethod
+    def preprocess_buckets(cls):
+        for idx, row in cls.plz_data.iterrows():
+            key = cls._get_bucket_key(row['lat'], row['lng'])
+            cls.buckets[key].append(idx)
+
+    @staticmethod
+    def _get_bucket_key(lat, lng):
+        return (int(lat // CostModel.bucket_size), int(lng // CostModel.bucket_size))
+
+
+    def get_plz_data(lat, long) -> dict:
         """
         Get the data for a given lat long.
         """
@@ -21,15 +36,20 @@ class CostModel:
         return data[['plz', 'lat', 'lng', 'inhab_plz', 'density', 'inhab_100']].to_dict()
 
 
-    def find_closest_plz_data(lat, long):
-        """ 
-            df is dataframe with columns 'lat', 'lng', 'plz' where
-            'lat' and 'lng' are the coordinates of the plz 
-            returns all data of the closest plz
-            """
-        # Calculate the distance between the row and all rows in df
-        distances = ((CostModel.plz_data['lng'] - long)**2 + (CostModel.plz_data['lat'] - lat)**2)**0.5
-        # Find the index of the closest row
+    def find_closest_plz_data(lat, lng):
+        key = CostModel._get_bucket_key(lat, lng)
+        nearby_indices = []
+
+        # Check current bucket and neighboring buckets
+        for dlat in [-1, 0, 1]:
+            for dlng in [-1, 0, 1]:
+                neighbor_key = (key[0] + dlat, key[1] + dlng)
+                nearby_indices.extend(CostModel.buckets.get(neighbor_key, []))
+
+        if not nearby_indices:
+            return None  # Fallback or error handling
+
+        candidates = CostModel.plz_data.loc[nearby_indices]
+        distances = np.sqrt((candidates['lng'] - lng)**2 + (candidates['lat'] - lat)**2)
         closest_index = distances.idxmin()
-        # Return the plz of the closest row
-        return CostModel.plz_data.iloc[closest_index]
+        return CostModel.plz_data.loc[closest_index]
