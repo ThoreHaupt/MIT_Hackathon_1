@@ -27,7 +27,17 @@ def parse_end_time(description):
             time_str = match.group(2)
             return datetime.datetime.strptime(f"{date_str} {time_str}", "%d.%m.%Y %H:%M")
 
-    return datetime.datetime.max  # Default if no match found
+    return datetime.datetime.max
+
+def parse_time_loss(description):
+    pattern = r"Reisezeitverlust: (\d+) Minuten"
+    for line in description:
+        match = re.search(pattern, line)
+        if match:
+            minutes = int(match.group(1))
+            return datetime.timedelta(minutes=minutes)
+
+    return datetime.timedelta()
 
 def fetch_traffic_warnings(road_id):
     url = f"{baseURL}{road_id}/services/warning"
@@ -42,7 +52,7 @@ def fetch_traffic_warnings(road_id):
             latitude = float(item["coordinate"]["lat"])
             description = " ".join(item["description"])
             isBlocked = item["isBlocked"] == "true"
-            estimatedTimeLoss = 0.0
+            estimatedTimeLoss = parse_time_loss(item["description"]).total_seconds()
             beginTime = datetime.datetime.fromisoformat(item["startTimestamp"])
             endTime = parse_end_time(item["description"])
 

@@ -51,3 +51,6 @@ def get_traffic_issues():
 def get_construction_data():
     return get_construction_data()
 
+def get_all_train_stations():
+    return get_train_stations()
+
