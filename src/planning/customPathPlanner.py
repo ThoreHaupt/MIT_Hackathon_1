@@ -3,14 +3,55 @@ from math import radians, cos, sin, sqrt, atan2
 from datetime import datetime
 from datetime import timedelta
 
+from cost_eval_model import CostAPI
 
 class CustomPathPlanner:
     def __init__(self, G):
         self.G = G
 
     # Custom edge cost function
-    def custom_cost(self, u, v, data, current_time):
+    def custom_cost(self, u, v, path_of_type, previous_edge_data, data, current_time):
+
+        """ 
+        u current node
+        v next node
+        data: edge data (dict)
+        previous_edge_data: previous edge data (dict)
+        current_time: current time (datetime)
+
+        data input for cost function:
+        {
+            "origin": { 
+                "lat": 0,
+                "lng": 0
+                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
+            },
+            "destination": {
+                "lat": 0,
+                "lng": 0,
+                "mode_next_edge": | "train" | "ship" | "truck" | "air"
+            },
+            "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
+            "max_speed_next_edge": 0, [km/h]
+            "distance_next_edge": 0, [km]
+            "distance_mode_start_next_edge": 0, [km]
+            "time_prior_edge_end": 0, 
+        } """
+        data["origin"]["lat"] = self.G.nodes[u]['y']
+        data["origin"]["lng"] = self.G.nodes[u]['x']
+        data["origin"]["mode_prior_edge"] = data.get("type", "Truck")
+        data["destination"]["lat"] = self.G.nodes[v]['y']
+        data["destination"]["lng"] = self.G.nodes[v]['x']
+        data["destination"]["mode_next_edge"] = previous_edge_data[u].get("type", "Truck")
+        data["highway"] = data.get("highway", "motorway")
+        data["max_speed_next_edge"] = data.get("max_speed", 0)
+        data["distance_next_edge"] = data.get("length", 0) / 1000  # Convert to km
+        data["distance_mode_start_next_edge"] = path_of_type.get("length", 0) / 1000  # Convert to km
+        data["time_prior_edge_end"] = current_time
+        data["time_next_edge_end"] = current_time 
+
         base_cost = data.get("length", 1)
+        self.cost_api.get_cost(data)
         return base_cost
 
     def get_travel_time(self, u, v, data, current_time):
@@ -38,7 +79,8 @@ class CustomPathPlanner:
         v_point = (self.G.nodes[v]['x'], self.G.nodes[v]['y'])
         return self.haversine(*u_point, *v_point)
         
-    def calculate_path(self, orig, dest):
+    def calculate_path(self, orig, dest, settings):
+        self.cost_api = CostAPI(settings["weight"], settings["size"])
         if orig == dest:
             return []  # Edge case: origin is the same as destination
 
@@ -57,7 +99,7 @@ class CustomPathPlanner:
         g_score = {orig: 0}
         segCost = {orig: None}
         times = {orig: current_time}
-        f_score = {orig: self.custom_cost(orig, dest, {}, current_time)}
+        f_score = {orig: 0}
 
         while open_list:
             _, current = heapq.heappop(open_list)
@@ -93,7 +135,7 @@ class CustomPathPlanner:
             for neighbor in self.G.neighbors(current):
                 edge_data = self.G[current][neighbor]
                 travel_time = self.get_travel_time(current, neighbor, edge_data, times[current])
-                tentative_g_score = g_score[current] + self.custom_cost(current, neighbor, edge_data, times[current])
+                tentative_g_score = g_score[current] + self.custom_cost(current, neighbor, path_of_type, mode_of_transport, edge_data, times[current])
 
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current

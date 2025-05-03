@@ -56,12 +56,12 @@ class PathPlanning:
                     }
                     self.graph.add_edge(matchedNodes[i], matchedNodes[j], **attrs)
 
-    def plan(self, origin, destination):
+    def plan(self, origin, destination, settings):
 
         start = ox.nearest_nodes(self.graph, origin[1], origin[0])
         end  = ox.nearest_nodes(self.graph, destination[1], destination[0])
 
-        path = self.planner.calculate_path(start, end)
+        path = self.planner.calculate_path(start, end, settings)
 
 
 
