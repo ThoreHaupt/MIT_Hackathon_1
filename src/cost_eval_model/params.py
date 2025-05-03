@@ -13,9 +13,10 @@ us_price_truck_per_km_per_ton = 0.146
 de_price_rail_per_km_per_ton = 0.11  # USD
 de_price_truck_per_km_per_truck = 1.65 # USD
 price_air_per_km_per_ton = 0.44 # USD
+price_ship_per_km_per_ton = 1500 # for simplicity => per km_per_ton values
 
 carbon_rail_per_km_per_ton = 0.015 # kg
 carbon_truck_per_km_per_ton = 0.119 # kg
-carbon_ocean_per_km_per_ton = 0.034 # kg
+carbon_ship_per_km_per_ton = 0.034 # kg
 carbon_air_per_km_per_ton = 0.500 # kg
 

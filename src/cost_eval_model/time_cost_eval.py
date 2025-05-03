@@ -1,4 +1,5 @@
-from cost_eval_model.params import *
+# from cost_eval_model.params import *
+from params import *
 from cost_model import CostModel
 
 class TimeCostModel(CostModel):
