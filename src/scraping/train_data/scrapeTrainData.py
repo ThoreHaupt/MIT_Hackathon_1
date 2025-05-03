@@ -3,8 +3,8 @@ from datetime import datetime
 import requests
 import xml.etree.ElementTree as ET
 
-from src.scraping.train_data.TrainClasses import TrainStation, TrainConnection
-from src.scraping.train_data.scarpeTrainStations import get_all_train_stations
+from scraping.train_data.TrainClasses import TrainStation, TrainConnection
+from scraping.train_data.scarpeTrainStations import get_all_train_stations
 
 from fuzzywuzzy import fuzz
 

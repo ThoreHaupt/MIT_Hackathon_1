@@ -67,9 +67,8 @@ def fetch_traffic_warnings(road_id):
 def featch_constructions(road_id):
     url = f"{baseURL}{road_id}/services/roadworks"
     response = requests.get(url, headers={"accept": "application/json"})
-
     if response.status_code == 200:
-        data = response.json().get("construction", [])
+        data = response.json().get("roadworks", [])
         traffic_issues = []
 
         for item in data:
