@@ -2,7 +2,7 @@ from cost_eval_model.params import *
 
 class CostEvaluator:
     
-    def __init__(self):
+    def __init__(self, weight, size):
         # weights for carbon, price, travel time, risk
         self.weight_price = 0.25
         
@@ -16,6 +16,8 @@ class CostEvaluator:
         self.max_speed_ship = 20 # km/h
         self.max_speed_air = 800 # km/h
 
+        self.weight = weight
+        self.size = size
 
         self.scraper_api = None
     

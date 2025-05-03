@@ -2,8 +2,6 @@ from scraping.traffic_data.traffic_issues import traffic_issues, get_constructio
 
 
 def plan_route(start, destination, settings):
-    traffic_issues_data = [issue.to_dict() for issue in traffic_issues()]
-    construction_sites_data = [issue.to_dict() for issue in get_construction_data()]
     return {
         "route_segments": [
         { "type": "Truck", # in {"Truck", "Train", "Ship", "Plane"}
@@ -42,6 +40,4 @@ def plan_route(start, destination, settings):
             "co2_emissions": 200,
         }
         ],
-        "traffic_issues": traffic_issues_data,
-        "construction_sites": construction_sites_data,
     }

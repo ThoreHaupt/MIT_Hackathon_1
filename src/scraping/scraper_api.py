@@ -1,5 +1,5 @@
 import datetime
-from scraping.WetterEnum import WeatherCondition
+from scraping.wetter_data.WetterEnum import WeatherCondition
 from scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
 from scraping.airplane_data.getAirports import getAirportsAsDict
 from scraping.traffic_data.traffic_issues import traffic_issues
@@ -7,7 +7,7 @@ from scraping.traffic_data.traffic_issues import traffic_issues
 import scraping.train_data.scarpeTrainStations as ts
 import scraping.train_data.scrapeTrainData as train_data
 
-from src.scraping.wetter_data import wetter_scraper
+from scraping.wetter_data import wetter_scraper
 
 
 def get_ship_data(locationStart, locationTaget):
