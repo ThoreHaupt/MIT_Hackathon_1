@@ -56,7 +56,6 @@ def get_construction_data():
 def get_flights():
     return AtlasAirScraper().getData()
 
-
 def get_all_train_stations():
     return get_train_stations()
 
