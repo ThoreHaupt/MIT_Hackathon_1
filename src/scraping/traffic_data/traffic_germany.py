@@ -111,5 +111,3 @@ def get_all_constructions():
         all_constructions.extend(constructions)
 
     return all_constructions
-
-print(get_all_constructions())
