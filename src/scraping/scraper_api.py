@@ -9,7 +9,7 @@ import scraping.train_data.scrapeTrainData as train_data
 
 from scraping.wetter_data import wetter_scraper
 
-from src.scraping.ship_data.scrape_ship_traffic import get_all_routes_ship
+from scraping.ship_data.scrape_ship_traffic import get_all_routes_ship
 
 
 def get_ship_data(locationStart, locationTaget):

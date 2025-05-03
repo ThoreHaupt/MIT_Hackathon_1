@@ -16,7 +16,8 @@ function initMap() {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             map.setView([lat, lon], 10); // Center map on user's location
-            L.marker([lat, lon]).addTo(map).openPopup();
+            var marker = L.marker([lat, lon]).addTo(map);
+            marker._icon.style.filter = "hue-rotate(140deg) saturate(100%)";
         }, function(error) {
             console.error("Geolocation failed:", error);
         });

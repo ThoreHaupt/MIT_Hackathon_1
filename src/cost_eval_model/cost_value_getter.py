@@ -18,7 +18,7 @@ class CostEvaluator:
         self.weight = weight
         self.size = size
 
-        self.scraper_api = ScraperAPI()
+        # self.scraper_api = ScraperAPI()
 
         self.risk_model: RiskCostModel = RiskCostModel()
         self.price_model: PriceCostModel = PriceCostModel()
@@ -53,11 +53,28 @@ class CostEvaluator:
         self.risk_weight = value
         return self.risk_weight
     
-    def get_cost(self, edge_data:dict, distance_current_mode:float):
+    def get_cost(self, edge_data:dict) -> dict:
         """
         Get the cost for a given edge.
             
-        "type": ["train", "ship", "road", "air"]
+        edge_data:
+        {
+            "origin": { 
+                "lat": 0,
+                "lng": 0
+                "mode_prior_edge": | "train" | "ship" | "truck" | "air"
+            },
+            "destination": {
+                "lat": 0,
+                "lng": 0,
+                "mode_next_edge": | "train" | "ship" | "truck" | "air"
+            },
+            "highway": "motorway" | "trunk" | "primary" | "secondary" | "tertiary"
+            "max_speed_next_edge": 0,
+            "distance_next_edge": 0,
+            "distance_mode_start_next_edge": 0,
+            "time_prior_edge_end": 0,
+        }
 
         """
         # Extract the data from the edge_data
