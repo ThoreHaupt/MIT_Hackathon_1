@@ -52,5 +52,5 @@ function useLocation(buttonId, inputName) {
 
 initMap();
 // Add event listeners for location buttons
-useLocation('use-location-source', 'origin');
+useLocation('use-location-start', 'start');
 useLocation('use-location-destination', 'destination');

@@ -12,9 +12,9 @@ def index():
 
 @app.route('/route', methods=['POST'])
 def route():
-    origin = request.form.get('origin')
+    start = request.form.get('start')
     destination = request.form.get('destination')
-    origin_coords = [1,1] #geocode_address(origin)
+    start_coords = [1,1] #geocode_address(start)
     destination_coords = [0,0] #geocode_address(destination)
     settings = {
         "use_truck": request.form.get('truckCheckBox') == 'on',
@@ -29,7 +29,7 @@ def route():
         "freight_size": float(request.form.get('freightSize', 0)),
     }
 
-    route_data = plan_route({"name": origin, "coords": origin_coords}, {"name": destination, "coords": destination_coords}, settings)
+    route_data = plan_route({"name": start, "coords": start_coords}, {"name": destination, "coords": destination_coords}, settings)
     return jsonify(route_data)
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
-def plan_route(origin, destination, settings):
+def plan_route(start, destination, settings):
 
     # Simulated multimodal route: Truck to Chicago, Train to LA
     return {
         "steps": [
-            f"Truck from {origin["name"]} to {destination["name"]}",
+            f"Truck from {start["name"]} to {destination["name"]}",
         ],
         "duration": "12 hours",
         "cost_estimate": "$1,800",
@@ -11,7 +11,7 @@ def plan_route(origin, destination, settings):
         "segments": [
             {
                 "type": "Truck",
-                "path": [origin["coords"], destination["coords"]]
+                "path": [start["coords"], destination["coords"]]
             }
         ]
     }

@@ -1,18 +1,18 @@
 import { map } from './map.js';
 
 function loadRoute() {
-    const origin = document.getElementById('origin');
+    const start = document.getElementById('start');
     const destination = document.getElementById('destination');
     const freightWeight = document.getElementById('freightWeight');
     const freightSize = document.getElementById('freightSize');
 
     // Validation checks with interactive warnings
-    if (!origin.value) {
-        origin.setCustomValidity('Origin cannot be empty.');
-        origin.reportValidity();
+    if (!start.value) {
+        start.setCustomValidity('Start cannot be empty.');
+        start.reportValidity();
         return;
     } else {
-        origin.setCustomValidity('');
+        start.setCustomValidity('');
     }
 
     if (!destination.value) {
@@ -40,7 +40,7 @@ function loadRoute() {
     }
 
     const formData = new FormData();
-    formData.append('origin', origin.value);
+    formData.append('start', start.value);
     formData.append('destination', destination.value);
     formData.append('truckCheckBox', document.getElementById('truck').checked ? 'on' : '');
     formData.append('trainCheckBox', document.getElementById('train').checked ? 'on' : '');
@@ -84,7 +84,7 @@ function loadRoute() {
         });
 
         // Add markers at start and end
-        L.marker(segments[0].path[0]).addTo(map).bindPopup("Origin").openPopup();
+        L.marker(segments[0].path[0]).addTo(map).bindPopup("Start").openPopup();
         L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
 
         // Adjust map view to fit all segments

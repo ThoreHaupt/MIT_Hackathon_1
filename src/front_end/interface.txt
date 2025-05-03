@@ -2,10 +2,10 @@ Frontend path route interface:
 
 Input (from Frontend):
 
-plan_route(origin, destination, settings) where
+plan_route(start, destination, settings) where
 
-origin: {"name": <origin_name>, "coords": <origin_coords>}
-destination: {"name": <origin_name>, "coords": <destination_coords>}
+start: {"name": <start_name>, "coords": <start_coords>}
+destination: {"name": <start_name>, "coords": <destination_coords>}
 settings: {
   "use_truck": true, # boolean
   "use_train": true, # boolean
@@ -23,7 +23,7 @@ Output (to Frontend):
 {
 route_segments: [
   { "type": "Truck", # in {"Truck", "Train", "Ship", "Plane"}
-    "path": [[x_1, y_1], [x_2, y_2]] # Coordinates of origin and destination
+    "path": [[x_1, y_1], [x_2, y_2]] # Coordinates of start and destination
     "distance": 0, # in m
     "duration": 0, # in s
     "cost": 0, # in s
