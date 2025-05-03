@@ -1,5 +1,5 @@
 import requests
-from WetterEnum import WeatherCondition
+from .WetterEnum import WeatherCondition
 
 
 PICTOCODE_TO_WEATHER = {
