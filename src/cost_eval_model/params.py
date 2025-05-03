@@ -19,4 +19,3 @@ carbon_rail_per_km_per_ton = 0.015 # kg
 carbon_truck_per_km_per_ton = 0.119 # kg
 carbon_ship_per_km_per_ton = 0.034 # kg
 carbon_air_per_km_per_ton = 0.500 # kg
-

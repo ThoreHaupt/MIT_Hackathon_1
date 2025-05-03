@@ -21,7 +21,7 @@ class TimeCostModel(CostModel):
             if construction:
                 time_cost += construction["estimatedTimeLoss"]
 
-            time_cost += self.time_cost["truck"] * data['distance_next_edge'] / data['max_speed_next_edge']
+            time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
 
         if data['origin']['mode_prior_edge'] == data['destination']['mode_next_edge']:
             time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
@@ -31,7 +31,10 @@ class TimeCostModel(CostModel):
             # fetch wait time from 
             #next_leave_time = transport_time_api.get_next_departure_time(data['origin']['lat'], data['origin']['lng'], data['destination']['lat'], data['destination']['lng'], data['origin']['mode_prior_edge'], data['destination']['mode_next_edge'])
             #wait_time = next_leave_time - current_time
-            wait_time = 3
-            time_cost += wait_time
+            if data['origin']['mode_next_edge'] == 'air':
+                time_cost = data["time_next_edge_end"] - data["time_prior_edge_end"]
+            else:
+                wait_time = 3
+                time_cost += wait_time
 
         return time_cost

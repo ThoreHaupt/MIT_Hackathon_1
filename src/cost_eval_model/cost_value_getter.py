@@ -81,6 +81,7 @@ class CostAPI:
             "distance_next_edge": 0,  [km]
             "distance_mode_start_next_edge": 0, [km]
             "time_prior_edge_end": 0, [datetime]
+            "time_next_edge_end": 0, [datetime]
         }
 
         """
