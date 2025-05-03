@@ -20,7 +20,7 @@ def route():
         "use_truck": request.form.get('truckCheckBox') == 'on',
         "use_train": request.form.get('trainCheckBox') == 'on',
         "use_ship": request.form.get('shipCheckBox') == 'on',
-        "use_plane": request.form.get('airCheckBox') == 'on',
+        "use_plane": request.form.get('planeCheckBox') == 'on',
         "weight_time": float(request.form.get('timeImportance', 0)),
         "weight_co2": float(request.form.get('co2Importance', 0)),
         "weight_money": float(request.form.get('moneyImportance', 0)),

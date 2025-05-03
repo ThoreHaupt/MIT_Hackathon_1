@@ -24,7 +24,7 @@ def plan_route(start, destination, settings):
             "cost": 300, # in s
             "co2_emissions": 150, # in CO₂e
         },
-        { "type": "Air",
+        { "type": "Plane",
             "path": [[10, 8], [15, 3]], # Coordinates of origin and destination
             "distance": 30, # in m
             "duration": 10800, # in s

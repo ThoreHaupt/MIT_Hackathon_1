@@ -45,7 +45,7 @@ function loadRoute() {
     formData.append('truckCheckBox', document.getElementById('truck').checked ? 'on' : '');
     formData.append('trainCheckBox', document.getElementById('train').checked ? 'on' : '');
     formData.append('shipCheckBox', document.getElementById('ship').checked ? 'on' : '');
-    formData.append('airCheckBox', document.getElementById('air').checked ? 'on' : '');
+    formData.append('planeCheckBox', document.getElementById('plane').checked ? 'on' : '');
     formData.append('timeImportance', document.getElementById('time-slider').value);
     formData.append('co2Importance', document.getElementById('co2-slider').value);
     formData.append('moneyImportance', document.getElementById('money-slider').value);
@@ -66,7 +66,7 @@ function loadRoute() {
             "Truck": "blue",
             "Train": "green",
             "Ship": "navy",
-            "Air": "red"
+            "Plane": "red"
         };
 
         // Clear existing layers from the map
