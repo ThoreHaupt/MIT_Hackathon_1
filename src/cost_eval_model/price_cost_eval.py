@@ -1,5 +1,7 @@
-from cost_eval_model.cost_model import CostModel
-from cost_eval_model.params import *
+# from cost_eval_model.cost_model import CostModel
+# from cost_eval_model.params import *
+from cost_model import CostModel
+from params import *
 
 class PriceCostModel(CostModel):
     """
@@ -15,5 +17,19 @@ class PriceCostModel(CostModel):
         :param data: The data to evaluate the model on.
         :return: The cost of the model.
         """
-        # Implement the evaluation logic here
-        pass
+        edge_cost = 0
+        dist_in_km = data["distance_next_edge"]
+        # data["dist_mode_start_next_edge"] += dist_in_km
+        if data["origin"]["mode_prior_edge"] == data["destination"]["mode_next_edge"]:
+            if data["origin"]["mode_next_edge"] == 'train':
+                edge_cost = us_price_rail_per_km_per_ton*dist_in_km
+            elif data["origin"]["mode_next_edge"] == 'air':
+                edge_cost = price_air_per_km_per_ton*dist_in_km
+            elif data["origin"]["mode_next_edge"] == 'truck':
+                edge_cost = us_price_truck_per_km_per_ton*dist_in_km
+            elif data['origin']['mode_next_edge'] == "ship":
+                edge_cost = price_ship_per_km_per_ton
+        else:
+            edge_cost = 2
+
+        return edge_cost
