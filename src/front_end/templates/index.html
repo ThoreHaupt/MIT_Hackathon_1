@@ -1,67 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transport Planning Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Form Section -->
-            <div class="col-md-4 p-4">
-                <h2>Transport Planning</h2>
-                <form id="transportForm" method="POST">
-                    <div class="mb-3">
-                        <label for="start_point" class="form-label">Starting Point</label>
-                        <input type="text" class="form-control" id="start_point" name="start_point" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="end_point" class="form-label">Destination</label>
-                        <input type="text" class="form-control" id="end_point" name="end_point" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="product_type" class="form-label">Product Type</label>
-                        <select class="form-select" id="product_type" name="product_type" required>
-                            <option value="general">General Cargo</option>
-                            <option value="perishable">Perishable Goods</option>
-                            <option value="hazardous">Hazardous Materials</option>
-                            <option value="bulk">Bulk Cargo</option>
-                        </select>
-                    </div>
-                    <h4>Priority Weights</h4>
-                    <div class="mb-3">
-                        <label for="time_weight" class="form-label">Time Importance (1-10)</label>
-                        <input type="range" class="form-range" id="time_weight" name="time_weight" min="1" max="10" value="5">
-                    </div>
-                    <div class="mb-3">
-                        <label for="cost_weight" class="form-label">Cost Importance (1-10)</label>
-                        <input type="range" class="form-range" id="cost_weight" name="cost_weight" min="1" max="10" value="5">
-                    </div>
-                    <div class="mb-3">
-                        <label for="carbon_weight" class="form-label">Carbon Footprint Importance (1-10)</label>
-                        <input type="range" class="form-range" id="carbon_weight" name="carbon_weight" min="1" max="10" value="5">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Calculate Route</button>
-                </form>
+    <div id="map" class="absolute inset-0 z-0"></div>
+    <div class="absolute z-10 top-10 left-20 max-w-md mx-auto mt-10 bg-white/90 shadow-lg rounded-xl p-6">
+        <div class="space-y-4 w-96">
+            <div>
+                <label for="origin" class="block text-sm font-medium text-gray-700">Source:</label>
+                <input type="text" id="origin" name="origin" placeholder="300 Vanderbilt Ave, Brooklyn, NY 11205, USA" required 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <button type="button" id="use-location-source" class="mt-2 text-sm text-indigo-600 hover:text-indigo-900">Use my location</button>
             </div>
             
-            <!-- Map Section -->
-            <div class="col-md-8 p-0">
-                <div id="map"></div>
+            <div>
+                <label for="destination" class="block text-sm font-medium text-gray-700">Destination:</label>
+                <input type="text" id="destination" name="destination" placeholder="9551-9567 Gregory Way, Beverly Hills, CA 90212, USA" required 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <button type="button" id="use-location-destination" class="mt-2 text-sm text-indigo-600 hover:text-indigo-900">Use my location</button>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mode of Transport:</label>
+                <div class="mt-2 space-y-2">
+                <div class="flex items-center">
+                    <input id="truck" type="checkbox" name="truckCheckBox" value="Truck" 
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="truck" class="ml-2 block text-sm text-gray-700">Truck</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="train" type="checkbox" name="trainCheckBox" value="Train" 
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="train" class="ml-2 block text-sm text-gray-700">Train</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="ship" type="checkbox" name="shipCheckBox" value="Ship" 
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="ship" class="ml-2 block text-sm text-gray-700">Ship</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="air" type="checkbox" name="airCheckBox" value="Air" 
+                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="air" class="ml-2 block text-sm text-gray-700">Air</label>
+                </div>
+                </div>
+            </div>
+            
+            <div>
+                <button type="submit"
+                onclick="loadRoute()"
+                class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Plan Route
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map', {zoomControl: false}).setView([42.36018610476105, -71.09414927401798], 4); // MIT
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Optional: Common freight hubs
+        const hubs = [];
+
+        hubs.forEach(hub => {
+            L.marker(hub.coords).addTo(map).bindPopup(hub.name);
+        });
+    </script>
+    <script>
+        function useLocation(buttonId, inputName) {
+            document.getElementById(buttonId).addEventListener('click', function() {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        // Fill input with coordinates (you can reverse geocode if needed)
+                        document.querySelector(`input[name="${inputName}"]`).value = `${lat}, ${lon}`;
+
+                        // Center map on user's location
+                        const userLocation = [lat, lon];
+                        map.setView(userLocation, 8);
+                        L.marker(userLocation).addTo(map).openPopup();
+                    }, function(error) {
+                        console.error("Geolocation failed:", error);
+                        alert("Unable to retrieve your location. Please try again.");
+                    });
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            });
+        }
+
+        useLocation('use-location-source', 'origin');
+        useLocation('use-location-destination', 'destination');
+    </script>
+
+    <script>
+        function loadRoute() {
+            const formData = new FormData();
+            formData.append('origin', document.getElementById('origin').value);
+            formData.append('destination', document.getElementById('destination').value);
+            formData.append('truckCheckBox', document.getElementById('truck').checked ? 'on' : '');
+            formData.append('trainCheckBox', document.getElementById('train').checked ? 'on' : '');
+            formData.append('shipCheckBox', document.getElementById('ship').checked ? 'on' : '');
+            formData.append('airCheckBox', document.getElementById('air').checked ? 'on' : '');
+
+            fetch('http://localhost:5000/route', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(route => {
+                const segments = route.segments;
+                const modeColors = {
+                    "Truck": "blue",
+                    "Train": "green",
+                    "Ship": "navy",
+                    "Air": "red"
+                };
+
+                // Clear existing layers from the map
+                map.eachLayer(layer => {
+                    if (!layer._url) { // Keep the tile layer
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Draw each segment with color by mode
+                segments.forEach(segment => {
+                    const color = modeColors[segment.mode] || 'gray';
+                    L.polyline(segment.path, { color: color, weight: 5 }).addTo(map)
+                        .bindPopup(`Mode: ${segment.mode}`);
+                });
+
+                // Add markers at start and end
+                L.marker(segments[0].path[0]).addTo(map).bindPopup("Origin").openPopup();
+                L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
+
+                // Adjust map view to fit all segments
+                const allCoordinates = segments.flatMap(segment => segment.path);
+                const bounds = L.latLngBounds(allCoordinates);
+                map.fitBounds(bounds);
+            })
+            .catch(error => console.error('Error fetching route:', error));
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
 </body>
 </html>
