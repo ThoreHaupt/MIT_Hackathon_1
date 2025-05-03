@@ -77,6 +77,7 @@ def featch_constructions(road_id):
             description = " ".join(item["description"])
             isBlocked = item["isBlocked"] == "true"
             estimatedTimeLoss = parse_time_loss(item["description"]).total_seconds()
+            beginTime = datetime.datetime.now()
             try:
                 beginTime = datetime.datetime.fromisoformat(item["startTimestamp"])
             except Exception as e:
