@@ -195,68 +195,84 @@ function loadRoute() {
 
 function loadTrafficIssues() {
     const active = document.getElementById('trafficIssues').checked;
+
     // Remove traffic issues markers
     map.eachLayer(layer => {
         if (layer.options && layer.options.icon && layer.options.icon.options.iconUrl === 'static/resources/traffic_issue.png') {
             map.removeLayer(layer);
         }
     });
+
     if (!active) {
         return;
     }
-    // Fetch traffic issues from the server
-    fetch('http://localhost:5000/traffic_issues_request', {
-        method: 'POST',
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Add traffic issues markers
-            const traffic_issue_icon = L.icon({
-                iconUrl: 'static/resources/traffic_issue.png',
-                iconSize: [30, 30],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            });
-            data.forEach(issue => {
-                L.marker([issue.latitude, issue.longitude], { icon: traffic_issue_icon })
-                    .addTo(map)
-                    .bindPopup(`Traffic Issue: ${issue.description}`);
-            });
-        })
-        .catch(error => console.error('Error fetching traffic issues:', error));
+
+    // Show preloaded traffic issues markers
+    preloadedTrafficIssues.forEach(marker => {
+        marker.addTo(map);
+    });
 }
+
+// Preload traffic issues markers at startup
+const preloadedTrafficIssues = [];
+fetch('http://localhost:5000/traffic_issues_request', {
+    method: 'POST',
+})
+    .then(response => response.json())
+    .then(data => {
+        const traffic_issue_icon = L.icon({
+            iconUrl: 'static/resources/traffic_issue.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+        data.forEach(issue => {
+            const marker = L.marker([issue.latitude, issue.longitude], { icon: traffic_issue_icon })
+                .bindPopup(`Traffic Issue: ${issue.description}`);
+            preloadedTrafficIssues.push(marker);
+        });
+    })
+    .catch(error => console.error('Error preloading traffic issues:', error));
 function loadConstructionSites() {
     const active = document.getElementById('constructionSites').checked;
+
     // Remove construction sites markers
     map.eachLayer(layer => {
         if (layer.options && layer.options.icon && layer.options.icon.options.iconUrl === 'static/resources/construction_site.png') {
             map.removeLayer(layer);
         }
     });
+
     if (!active) {
         return;
     }
-    // Fetch construction sites from the server
-    fetch('http://localhost:5000/construction_sites_request', {
-        method: 'POST',
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Add construction sites markers
-            const construction_site_icon = L.icon({
-                iconUrl: 'static/resources/construction_site.png',
-                iconSize: [30, 30],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            });
-            data.forEach(site => {
-                L.marker([site.latitude, site.longitude], { icon: construction_site_icon })
-                    .addTo(map)
-                    .bindPopup(`Construction Site: ${site.description}`);
-            });
-        })
-        .catch(error => console.error('Error fetching construction sites:', error));
+
+    // Show preloaded construction sites markers
+    preloadedConstructionSites.forEach(marker => {
+        marker.addTo(map);
+    });
 }
+
+// Preload construction sites markers at startup
+const preloadedConstructionSites = [];
+fetch('http://localhost:5000/construction_sites_request', {
+    method: 'POST',
+})
+    .then(response => response.json())
+    .then(data => {
+        const construction_site_icon = L.icon({
+            iconUrl: 'static/resources/construction_site.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+        data.forEach(site => {
+            const marker = L.marker([site.latitude, site.longitude], { icon: construction_site_icon })
+                .bindPopup(`Construction Site: ${site.description}`);
+            preloadedConstructionSites.push(marker);
+        });
+    })
+    .catch(error => console.error('Error preloading construction sites:', error));
 
 
 window.loadRoute = loadRoute;
