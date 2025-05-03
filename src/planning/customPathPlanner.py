@@ -82,12 +82,7 @@ class CustomPathPlanner:
         
     def calculate_path(self, orig, dest, settings):
         self.cost_api = CostAPI(settings["freight_weight"], settings["freight_size"])
-        self.cost_api.set_price_weight(settings["weight_money"])
-        self.cost_api.set_carbon_weight(settings["weight_co2"])
-        self.cost_api.set_travel_time_weight(settings["weight_time"])
-        self.cost_api.set_risk_weight(settings["weight_risk"])
-
-
+        self.cost_api.set_settings(settings)
 
         if orig == dest:
             return []  # Edge case: origin is the same as destination
