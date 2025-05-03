@@ -180,7 +180,7 @@ function loadRoute() {
         });
 
         // Add markers at start and end
-        L.marker(segments[0].path[0]).addTo(map).bindPopup("Start").openPopup();
+        L.marker(segments[0].path[0]).addTo(map).bindPopup("Start");
         L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
 
         // Adjust map view to fit all segments
