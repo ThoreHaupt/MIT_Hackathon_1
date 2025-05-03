@@ -1,4 +1,5 @@
-from cost_eval_model.params import *
+# from cost_eval_model.params import *
+from params import *
 from cost_model import CostModel
 
 class TimeCostModel(CostModel):
@@ -10,11 +11,10 @@ class TimeCostModel(CostModel):
         """
         Calculate the time per km for each transport type.
         """
-        cost_dict = {
-            "train": 1 / self.,
-            "ship": 1 / self.,
-            "road": 1 / self.,
-            "air": 1 / self.
-        }
-
-        return cost_dict[transport_type] * distance
+        # same mode
+        #   cost = dependent on mode
+        #           => distance * cost
+        #           dist_mode_start_next_edge += dist
+        # not same mode (for time => add 2 Stunden)
+        # speed?
+        pass
