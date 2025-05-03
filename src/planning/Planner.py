@@ -13,8 +13,9 @@ class PathPlanning:
     def __init__(self):
         self.graph = None
         self.planner = None
+        self.customID = 1e9
 
-        self.loadRoadGraph("/media/louis/T7/road_graph_autobahn_cleared.pkl")
+        self.loadRoadGraph("/media/nils/Nils_Data/MIT-Hackathon/road_graph_autobahn_cleared.pkl")
         self.idxs = [n for n in self.graph]
         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
 
@@ -44,17 +45,23 @@ class PathPlanning:
             matchedNodes.append(self.idxs[idx])
 
         for i, airport in enumerate(matchedAirports):
-            for j, airport2 in enumerate(matchedAirports):
-                outgoingFlights = flights[(flights['Dept Station'] == airport) & (flights['Arr Station'] == airport2)]
-                for row in outgoingFlights.itertuples():
-                    attrs = {
-                        "type": "air",
-                        "startTime": row["ETD (Zulu)"],
-                        "endTime": row["ETA (Zulu)"],
-                        "length": math.dist((self.graph.nodes[matchedNodes[i]]["x"],self.graph.nodes[matchedNodes[i]]["y"],
-                                            (self.graph.nodes[matchedNodes[j]]["x"],self.graph.nodes[matchedNodes[j]]["y"])))
-                    }
-                    self.graph.add_edge(matchedNodes[i], matchedNodes[j], **attrs)
+            outgoingFlights = flights[flights['Dept Station'] == airport]
+            for index, row in outgoingFlights.iterrows():
+                if row['Arr Station'] not in matchedNodes:
+                    coordinates = airports[row['Arr Station']]
+                    self.graph.add_node(self.customID, x=coordinates[1], y=coordinates[0])
+                    otherNode = self.graph.nodes[self.customID]
+                    self.customID += 1
+
+                attrs = {
+                    "type": "Plane",
+                    "startTime": row["ETD (Zulu)"],
+                    "endTime": row["ETA (Zulu)"],
+                    "length": math.dist((self.graph.nodes[matchedNodes[i]]["x"],self.graph.nodes[matchedNodes[i]]["y"]),
+                                        (otherNode["x"],otherNode["y"]))
+                }
+
+                self.graph.add_edge(matchedNodes[i], self.customID-1, **attrs)
 
     def plan(self, origin, destination):
 
