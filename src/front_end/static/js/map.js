@@ -1,8 +1,5 @@
 
-
-// Declare map variable in a higher scope
-let map;
-
+export let map;
 function initMap() {
     map = L.map('map', {zoomControl: false}).setView([42.36018610476105, -71.09414927401798], 7); // Default to MIT
     L.control.zoom({

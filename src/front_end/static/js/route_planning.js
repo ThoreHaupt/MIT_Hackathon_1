@@ -1,4 +1,4 @@
-
+import { map } from './map.js';
 
 function loadRoute() {
     const formData = new FormData();
@@ -14,6 +14,7 @@ function loadRoute() {
     formData.append('riskImportance', document.getElementById('risk-slider').value);
     formData.append('freightWeight', document.getElementById('freightWeight').value);
     formData.append('freightSize', document.getElementById('freightSize').value);
+    console.log("Form data:", formData);
 
     fetch('http://localhost:5000/route', {
         method: 'POST',
@@ -21,6 +22,7 @@ function loadRoute() {
     })
     .then(response => response.json())
     .then(route => {
+        console.log("Route data:", route);
         const segments = route.segments;
         const modeColors = {
             "Truck": "blue",
@@ -54,3 +56,5 @@ function loadRoute() {
     })
     .catch(error => console.error('Error fetching route:', error));
 }
+
+window.loadRoute = loadRoute;
