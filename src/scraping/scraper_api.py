@@ -2,7 +2,7 @@ import datetime
 from scraping.wetter_data.WetterEnum import WeatherCondition
 from scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
 from scraping.airplane_data.getAirports import getAirportsAsDict
-from scraping.traffic_data.traffic_issues import traffic_issues
+from scraping.traffic_data.traffic_issues import traffic_issues, get_construction_data
 
 import scraping.train_data.scarpeTrainStations as ts
 import scraping.train_data.scrapeTrainData as train_data
@@ -58,7 +58,7 @@ def flight_available(locationStart, locationTaget):
 def get_traffic_issues():
     return traffic_issues()
 
-def get_construction_data():
+def get_construction_site_data():
     return get_construction_data()
 
 def get_flights():
