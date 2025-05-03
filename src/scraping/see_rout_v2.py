@@ -1,3 +1,5 @@
+import os
+
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import Point, box
@@ -7,7 +9,7 @@ import numpy as np
 from itertools import product
 
 # Load land polygon dataset (Natural Earth's coastline) - load once globally
-LAND = gpd.read_file("ne_10m_land/ne_10m_land.shp")
+LAND = gpd.read_file(os.path.join(os.path.dirname(__file__), 'ne_10m_land/ne_10m_land.shp'))
 
 
 def is_water(lat, lon, grid_size=0.05, num_samples=9, threshold=0.5):

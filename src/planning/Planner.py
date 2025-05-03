@@ -1,4 +1,5 @@
 import math
+from datetime import datetime
 
 import osmnx as ox
 import pickle
@@ -7,6 +8,8 @@ from planning.customPathPlanner import CustomPathPlanner
 from scraping import scraper_api
 from scipy.spatial import cKDTree
 
+from scraping.ship_data import scrape_ship_traffic
+from scraping import see_rout_v2
 
 
 class PathPlanning:
@@ -20,6 +23,7 @@ class PathPlanning:
         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
 
         self.appendAirRoutes()
+        self.appendSeaRoutes()
 
         self.planner = CustomPathPlanner(self.graph)
 
@@ -62,6 +66,58 @@ class PathPlanning:
                 }
 
                 self.graph.add_edge(matchedNodes[i], self.customID-1, **attrs)
+
+    def appendSeaRoutes(self):
+        ports = scrape_ship_traffic.get_mock_data()
+
+        flights = scraper_api.get_flights()
+        matchedPorts = []
+        matchedNodes = []
+
+        for port in ports:
+            coordinates = (port.latitude, port.longitude)
+            dist, idx = self.roadTree.query([coordinates[1], coordinates[0]])
+            if dist > 0.01:
+                continue
+            matchedPorts.append(port.name)
+            matchedNodes.append(self.idxs[idx])
+
+        for startPoint in [x for x in ports if x.name == "Hamburg"]:
+            p = [x for x in ports if x != startPoint][0]
+            endpoint = (p.latitude, p.longitude)
+            prev = (startPoint.latitude, startPoint.longitude)
+            if startPoint.name not in matchedPorts:
+                self.graph.add_node(self.customID, x=prev[1], y=prev[0])
+                othernode = self.customID
+                self.customID += 1
+            else:
+                othernode= matchedNodes[matchedPorts.index(startPoint.name)]
+
+            for routePoint in see_rout_v2.getRouteHamburgBoston():
+                attrs = {
+                    "type": "Ship",
+                    "length": math.dist((prev[0], prev[1]), (routePoint[0], routePoint[1])),
+                    "maxspeed": 40
+                }
+                self.graph.add_node(self.customID, x=routePoint[1], y=routePoint[0])
+                otherNode2 = self.customID
+                self.customID += 1
+
+                self.graph.add_edge(othernode, otherNode2, **attrs)
+                prev = routePoint
+                othernode = otherNode2
+            attrs = {
+                "type": "Ship",
+                "length": math.dist((prev[0], prev[1]), (endpoint[0], endpoint[1])),
+                "maxspeed": 40
+            }
+            self.graph.add_node(self.customID, x=endpoint[1], y=endpoint[0])
+            otherNode = self.customID
+            self.customID += 1
+
+            self.graph.add_edge(otherNode2, otherNode, **attrs)
+
+
 
     def plan(self, origin, destination):
 
