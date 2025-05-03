@@ -1,9 +1,6 @@
 import requests
 from geographiclib.geodesic import Geodesic
 
-from ship_data.scrape_ship_traffic import get_all_routes_ship
-
-
 # from src.scraping import get_ships
 
 
@@ -11,6 +8,43 @@ from geopy.distance import geodesic
 import numpy as np
 import osmnx as ox
 import networkx as nx
+from global_land_mask import globe
+
+
+def adjust_to_water(lon: float, lat: float, max_steps: int = 10, step_km: float = 1) -> tuple:
+    """
+    Adjusted version with coordinate validation and boundary handling.
+    """
+    geod = Geodesic.WGS84
+    directions = [0, 90, 180, 270]  # North, East, South, West
+
+    # Validate initial coordinates
+    if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+        print(f"Invalid coordinates: ({lon}, {lat})")
+        return (lon, lat)  # Return invalid point as fallback
+
+    for steps in range(1, max_steps + 1):
+        for direction in directions:
+            distance = steps * step_km * 1000
+            p = geod.Direct(lat, lon, direction, distance)
+
+            # Get new coordinates with boundary checks
+            new_lat = np.clip(p['lat2'], -89.9999, 89.9999)
+            new_lon = p['lon2'] % 360  # Normalize longitude
+            if new_lon > 180:
+                new_lon -= 360
+
+            # Skip invalid coordinates
+            if not (-90 <= new_lat <= 90) or not (-180 <= new_lon <= 180):
+                continue
+
+            try:
+                if not globe.is_land(new_lat, new_lon):
+                    return (new_lon, new_lat)
+            except IndexError:
+                continue  # Skip invalid grid positions
+
+    return (lon, lat)  # Fallback to original point
 
 
 def get_hybrid_route(start_long: float, start_lat: float,
@@ -18,31 +52,28 @@ def get_hybrid_route(start_long: float, start_lat: float,
                      coastal_threshold_km: float = 50,
                      ocean_point_spacing_km: float = 500) -> list:
     """
-    Get intermediate waypoints for a shipping route using hybrid approach.
-
-    Args:
-        start_long: Starting longitude
-        start_lat: Starting latitude
-        end_long: Ending longitude
-        end_lat: Ending latitude
-        coastal_threshold_km: Distance threshold to switch from ocean to coastal routing (km)
-        ocean_point_spacing_km: Spacing between ocean route waypoints (km)
-
-    Returns:
-        List of (longitude, latitude) tuples including start, waypoints, and end points
+    Get intermediate waypoints for a shipping route, ensuring all points are in water.
     """
     start = (start_lat, start_long)
     end = (end_lat, end_long)
-
-    # Calculate total distance
     total_distance = geodesic(start, end).kilometers
 
     if total_distance > coastal_threshold_km:
-        # Ocean route - great circle navigation
-        return get_ocean_waypoints(start_long, start_lat, end_long, end_lat, ocean_point_spacing_km)
+        waypoints = get_ocean_waypoints(start_long, start_lat, end_long, end_lat, ocean_point_spacing_km)
     else:
-        # Coastal route - follow waterways
-        return get_coastal_waypoints(start_long, start_lat, end_long, end_lat)
+        waypoints = get_coastal_waypoints(start_long, start_lat, end_long, end_lat)
+
+    # Adjust all waypoints to ensure they're in water
+    adjusted_waypoints = []
+    for point in waypoints:
+        lon, lat = point
+        if globe.is_land(lat, lon):
+            adjusted = adjust_to_water(lon, lat)
+            adjusted_waypoints.append(adjusted)
+        else:
+            adjusted_waypoints.append(point)
+
+    return adjusted_waypoints
 
 
 # def get_ocean_waypoints(start_long: float, start_lat: float,
@@ -159,14 +190,13 @@ def get_coastal_waypoints(start_long: float, start_lat: float,
 
 
 # Example usage
-habors = get_all_routes_ship()
-print(habors[0][0])
-print(habors[0][1])
-waypoints = get_hybrid_route(habors[0][0].longitude, habors[0][0].latitude, habors[0][1].longitude, habors[0][1].latitude, coastal_threshold_km=1, ocean_point_spacing_km=500)
+p1 = (8.889906, 44.404263)
+p2 = (-118.199826, 33.762325)
+waypoints = get_hybrid_route(p1[0], p1[1], p2[0], p2[1], coastal_threshold_km=10, ocean_point_spacing_km=10)
 print("Route waypoints (longitude, latitude):")
-print(len(habors))
-waypoints.append((habors[0][0].longitude, habors[0][0].latitude))
-waypoints.append((habors[0][1].longitude, habors[0][1].latitude))
+waypoints.append(p1)
+waypoints.append(p2)
+
 for i, (lon, lat) in enumerate(waypoints):
     print(f"{lon:.6f}, {lat:.6f}")
 
