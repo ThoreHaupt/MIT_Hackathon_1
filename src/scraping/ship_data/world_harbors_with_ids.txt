@@ -1603,7 +1603,7 @@
 1603, Aln Harbour, 55.3854892, -1.6169743
 1604, 熊本港, 32.7602, 130.580197
 1605, သရက္ေလွဆိပ္, 19.3204835, 95.1848964
-1606, Jachthaven Linkeroever, 51.2303873, 4.3935842
+1606, Jachthaven Linkeroever, 51.2303873, 4.3935842 // Antwerp
 1607, Unnamed Harbor, -0.9057107, -50.7912851
 1608, Port de Lavera, 43.3970604, 4.994759
 1609, Pelabuhan Penyeberangan Wahai, -2.7945763, 129.5144396

@@ -49,7 +49,6 @@ def process_osm_data(data):
 
 def get_world_bboxes(grid_size=10):
     """Divide the world into smaller bounding boxes for querying"""
-    # Bounding box format: (min_lat, min_lon, max_lat, max_lon)
     bboxes = []
     lat_step = 180 / grid_size
     lon_step = 360 / grid_size
@@ -82,7 +81,6 @@ def main():
             all_harbors.extend(harbors)
         time.sleep(1)  # Be polite to the API
 
-    # Remove duplicates (some harbors might appear in multiple bounding boxes)
     unique_harbors = list({(name, lat, lon) for name, lat, lon in all_harbors})
 
     print(f"Found {len(unique_harbors)} harbors. Saving to {output_file}...")
@@ -103,23 +101,16 @@ def add_line_numbers_as_ids(input_file, output_file=None, delimiter=','):
         output_file (str): Path to the output file (if None, overwrites input file)
         delimiter (str): Delimiter to use between ID and original line content
     """
-    # Read all lines from the input file
     with open(input_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
-    # Process each line to add ID
     processed_lines = []
     for i, line in enumerate(lines, start=1):
-        # Remove any existing newline characters
         cleaned_line = line.strip('\n\r')
-        # Add ID and original content with delimiter
         processed_line = f"{i}{delimiter} {cleaned_line}\n"
         processed_lines.append(processed_line)
 
-    # Determine output file path
     output_path = output_file if output_file else input_file
-
-    # Write processed lines to output file
     with open(output_path, 'w', encoding='utf-8') as f:
         f.writelines(processed_lines)
 

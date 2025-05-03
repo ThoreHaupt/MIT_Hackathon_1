@@ -9,6 +9,8 @@ import scraping.train_data.scrapeTrainData as train_data
 
 from scraping.wetter_data import wetter_scraper
 
+from src.scraping.ship_data.scrape_ship_traffic import get_all_routes_ship
+
 
 def get_ship_data(locationStart, locationTaget):
     return {
@@ -42,7 +44,7 @@ def get_airports():
     return getAirportsAsDict()
 
 def get_ships():
-    return ["Berlin", "Karlsruhe", "Hamburg"]
+    return get_all_routes_ship()
 
 def ship_available(locationStart, locationTaget):
     return True
@@ -64,4 +66,5 @@ def get_flights():
 
 def get_all_train_stations():
     return get_train_stations()
+
 
