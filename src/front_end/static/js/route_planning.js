@@ -59,9 +59,9 @@ function loadRoute() {
         body: formData
     })
     .then(response => response.json())
-    .then(route => {
-        console.log("Route data:", route);
-        const segments = route.route_segments;
+    .then(data => {
+        console.log("Traffic issues data:", data);
+        const segments = data.route_segments;
         const typeColors = {
             "Truck": "blue",
             "Train": "green",
@@ -119,6 +119,35 @@ function loadRoute() {
         // Add markers at start and end
         L.marker(segments[0].path[0]).addTo(map).bindPopup("Start").openPopup();
         L.marker(segments[segments.length - 1].path[1]).addTo(map).bindPopup("Destination");
+
+        
+        const traffic_issue_icon = L.icon({
+            iconUrl: 'static/resources/traffic_issue.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+
+        const construction_site_icon = L.icon({
+            iconUrl: 'static/resources/construction_site.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+
+        // Add traffic issues markers
+        data.traffic_issues.forEach(issue => {
+            L.marker([issue.latitude, issue.longitude], { icon: traffic_issue_icon })
+                .addTo(map)
+                .bindPopup(`Traffic Issue: ${issue.description}`);
+        });
+
+        // Add construction sites markers
+        data.construction_sites.forEach(site => {
+            L.marker([site.latitude, site.longitude], { icon: construction_site_icon })
+                .addTo(map)
+                .bindPopup(`Construction Site: ${site.description}`);
+        });
 
         // Adjust map view to fit all segments
         const allCoordinates = segments.flatMap(segment => segment.path);

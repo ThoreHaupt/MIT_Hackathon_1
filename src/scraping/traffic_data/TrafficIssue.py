@@ -15,3 +15,14 @@ class TrafficIssue:
         return (f"TrafficIssue(longitude={self.longitude}, latitude={self.latitude}, description={self.description}, "
                 f"isBlocked={self.isBlocked}, estimatedTimeLoss={self.estimatedTimeLoss}, "
                 f"beginTime={self.beginTime}, endTime={self.endTime})")
+    
+    def to_dict(self):
+        return {
+            "longitude": self.longitude,
+            "latitude": self.latitude,
+            "description": self.description,
+            "isBlocked": self.isBlocked,
+            "estimatedTimeLoss": self.estimatedTimeLoss,
+            "beginTime": self.beginTime.isoformat() if self.beginTime else None,
+            "endTime": self.endTime.isoformat() if self.endTime else None
+        }
