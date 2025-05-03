@@ -63,7 +63,7 @@ class CustomPathPlanner:
                 while current in came_from:
 
                     segment = { "type": mode_of_transport[last], # in {"Truck", "Train", "Ship", "Plane"}
-                                "path": [[self.G.nodes[current]['x'], self.G.nodes[current]['y']], [self.G.nodes[last]['x'], self.G.nodes[last]['y']]], # Coordinates of start and destination
+                                "path": [[self.G.nodes[current]['y'], self.G.nodes[current]['x']], [self.G.nodes[last]['y'], self.G.nodes[last]['x']]], # Coordinates of start and destination
                                 "distance": segCost[last]["distance"], # in m
                                 "duration": segCost[last]["duration"], # in s
                                 "cost": segCost[last]["cost"], # in s
