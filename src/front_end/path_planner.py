@@ -1,5 +1,5 @@
 
-from src import planning
+import planning
 
 
 def plan_route(start, destination, settings):

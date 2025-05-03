@@ -7,5 +7,5 @@ class Harbor:
         self.longitude = longitude
 
     def __str__(self):
-        return f"Habor(id={self.id}, name={self.name}, latitude={self.latitude}, longitude={self.longitude})"
+        return f"Harbor(id={self.id}, name={self.name}, latitude={self.latitude}, longitude={self.longitude})"
 
