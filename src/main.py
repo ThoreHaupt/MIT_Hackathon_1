@@ -1,4 +1,4 @@
-import planning.Planner as planner
+import front_end.app as app
 
 if __name__ == "__main__":
-    planner.PathPlanning()
+    app.app.run(debug=True)

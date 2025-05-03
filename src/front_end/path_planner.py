@@ -1,3 +1,6 @@
+from scraping.traffic_data.traffic_issues import traffic_issues
+
+
 def plan_route(start, destination, settings):
 
     # Simulated multimodal route: Truck to Chicago, Train to LA

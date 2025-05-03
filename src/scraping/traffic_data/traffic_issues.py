@@ -1,4 +1,4 @@
-from src.scraping.traffic_data.traffic_germany import get_all_traffic_warnings, get_all_constructions
+from scraping.traffic_data.traffic_germany import get_all_traffic_warnings, get_all_constructions
 
 
 def traffic_issues():
