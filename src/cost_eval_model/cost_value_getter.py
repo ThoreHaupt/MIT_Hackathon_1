@@ -22,7 +22,7 @@ class CostAPI:
         self.size = size
         self.settings = {}
 
-        self.construction_site_data = get_construction_site_data() # returns a list of dicts with lat, lng, and other data
+        self.construction_site_data = get_construction_data() # returns a list of dicts with lat, lng, and other data
         self.construction_manager = ConstructionManager(self.construction_site_data)
 
         self.risk_model: RiskCostModel = RiskCostModel()

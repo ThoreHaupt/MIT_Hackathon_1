@@ -80,7 +80,7 @@ class CustomPathPlanner:
         return self.haversine(*u_point, *v_point)
         
     def calculate_path(self, orig, dest, settings):
-        self.cost_api = CostAPI(settings["weight"], settings["size"])
+        self.cost_api = CostAPI(settings["freight_weight"], settings["freight_size"])
         self.cost_api.set_price_weight(settings["weight_money"])
         self.cost_api.set_carbon_weight(settings["weight_co2"])
         self.cost_api.set_travel_time_weight(settings["weight_time"])
