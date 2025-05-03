@@ -1,8 +1,5 @@
 import heapq
-import networkx as nx
-from anyio import current_time
 from math import radians, cos, sin, sqrt, atan2
-from networkx.algorithms.shortest_paths.astar import astar_path
 from datetime import datetime
 from datetime import timedelta
 
@@ -82,8 +79,6 @@ class CustomPathPlanner:
                 tentative_g_score = g_score[current] + self.custom_cost(current, neighbor, self.G[current][neighbor],
                                                                    times[current])
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                    print(self.G.nodes[current]['y'] - self.G.nodes[neighbor]['y'],
-                          self.G.nodes[current]['x'] - self.G.nodes[neighbor]['x'])
 
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score

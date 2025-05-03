@@ -1,16 +1,10 @@
 import math
 
 import osmnx as ox
-import networkx as nx
 import pickle
-from pyrosm import OSM
 
 from planning.customPathPlanner import CustomPathPlanner
-#import pathPlanner
-#import customPathPlanner
 from scraping import scraper_api
-from multiprocessing import Pool
-import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 
 
