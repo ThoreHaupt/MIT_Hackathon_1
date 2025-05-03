@@ -1,8 +1,8 @@
 import datetime
-from src.scraping.WetterEnum import WeatherCondition
-from src.scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
-from src.scraping.airplane_data.getAirports import getAirportsAsDict
-from src.scraping.traffic_data.traffic_issues import traffic_issues
+from scraping.WetterEnum import WeatherCondition
+from scraping.airplane_data.AtlasAirScraper import AtlasAirScraper
+from scraping.airplane_data.getAirports import getAirportsAsDict
+from scraping.traffic_data.traffic_issues import traffic_issues
 
 
 def get_ship_data(locationStart, locationTaget):

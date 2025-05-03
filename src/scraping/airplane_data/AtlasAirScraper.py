@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.scraping.airplane_data.IIAirScraperScraper import IAirScraper
+from scraping.airplane_data.IIAirScraperScraper import IAirScraper
 
 
 class AtlasAirScraper(IAirScraper):

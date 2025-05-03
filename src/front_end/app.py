@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from path_planner import plan_route  # Placeholder for your logic
-from address_to_coord_converter import geocode_address  # Placeholder for your logic
+from .path_planner import plan_route  # Placeholder for your logic
+from .address_to_coord_converter import geocode_address  # Placeholder for your logic
 
 app = Flask(__name__)
 CORS(app)

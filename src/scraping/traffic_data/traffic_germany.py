@@ -3,7 +3,7 @@ import re
 
 import requests
 
-from src.scraping.traffic_data.TrafficIssue import TrafficIssue
+from scraping.traffic_data.TrafficIssue import TrafficIssue
 
 baseURL = "https://verkehr.autobahn.de/o/autobahn/"
 

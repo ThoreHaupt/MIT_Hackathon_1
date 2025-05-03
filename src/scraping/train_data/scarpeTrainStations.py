@@ -1,5 +1,5 @@
 
-from src.scraping.train_data.TrainStation import TrainStation
+from scraping.train_data.TrainStation import TrainStation
 
 import re
 import requests
