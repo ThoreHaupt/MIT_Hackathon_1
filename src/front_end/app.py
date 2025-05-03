@@ -17,10 +17,14 @@ def route():
     origin_coords = geocode_address(origin)
     destination_coords = geocode_address(destination)
     settings = {
-        "useTruck": request.form.get('truckCheckBox') == 'on',
-        "useTrain": request.form.get('trainCheckBox') == 'on',
-        "useShip": request.form.get('shipCheckBox') == 'on',
-        "usePlane": request.form.get('airCheckBox') == 'on',
+        "use_truck": request.form.get('truckCheckBox') == 'on',
+        "use_train": request.form.get('trainCheckBox') == 'on',
+        "use_ship": request.form.get('shipCheckBox') == 'on',
+        "use_plane": request.form.get('airCheckBox') == 'on',
+        "weight_time": float(request.form.get('timeImportance', 0)),
+        "co2_weight": float(request.form.get('co2Importance', 0)),
+        "money_weight": float(request.form.get('moneyImportance', 0)),
+        "risk_weight": float(request.form.get('riskImportance', 0)),
     }
 
     route_data = plan_route({"name": origin, "coords": origin_coords}, {"name": destination, "coords": destination_coords}, settings)
