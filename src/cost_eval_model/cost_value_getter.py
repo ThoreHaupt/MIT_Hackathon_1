@@ -6,7 +6,7 @@ from cost_eval_model.time_cost_eval import TimeCostModel
 from cost_eval_model.construction_manager import ConstructionManager
 
 
-from scraping import ScraperAPI
+from scraping.scraper_api import get_construction_data
 
 
 class CostAPI:
@@ -21,9 +21,8 @@ class CostAPI:
         self.weight = weight
         self.size = size
 
-        self.scraper_api = ScraperAPI()
 
-        self.construction_site_data = self.scraper_api.get_construction_site_data() # returns a list of dicts with lat, lng, and other data
+        self.construction_site_data = get_construction_site_data() # returns a list of dicts with lat, lng, and other data
         self.construction_manager = ConstructionManager(self.construction_site_data)
 
         self.risk_model: RiskCostModel = RiskCostModel()

@@ -1,6 +1,6 @@
 # from cost_eval_model.params import *
-from params import *
-from cost_model import CostModel
+from .params import *
+from .cost_model import CostModel
 
 class TimeCostModel(CostModel):
     def __init__(self, time_cost):

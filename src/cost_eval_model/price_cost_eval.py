@@ -1,7 +1,7 @@
 # from cost_eval_model.cost_model import CostModel
 # from cost_eval_model.params import *
-from cost_model import CostModel
-from params import *
+from .cost_model import CostModel
+from .params import *
 
 class PriceCostModel(CostModel):
     """

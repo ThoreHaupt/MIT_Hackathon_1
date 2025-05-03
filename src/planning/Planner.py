@@ -14,11 +14,11 @@ class PathPlanning:
         self.graph = None
         self.planner = None
 
-        self.loadRoadGraph("/media/louis/T7/road_graph_autobahn_cleared.pkl")
+        self.loadRoadGraph("/media/louis/T7/road_graph_cleared_merged_exma.pkl")
         self.idxs = [n for n in self.graph]
         self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
 
-        self.appendAirRoutes()
+        # self.appendAirRoutes()
 
         self.planner = CustomPathPlanner(self.graph)
 
