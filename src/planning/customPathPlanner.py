@@ -52,16 +52,17 @@ class CustomPathPlanner:
 
         base_cost = data.get("length", 1)
         custom_costs = self.cost_api.get_cost(data)
-        return custom_costs.get("total_cost", base_cost)  # Default to base cost if not found
+        return custom_costs  # Default to base cost if not found
 
     def get_travel_time(self, u, v, data, current_time):
         return 1
 
-    def get_all_costs(self,u,v,data,current_time):
+    def get_all_costs(self,u,v,data,current_time, costs):
         return { "distance": self.haversine(self.G.nodes[u]['x'], self.G.nodes[u]['y'], self.G.nodes[v]['x'], self.G.nodes[v]['y']),  # in m
-        "duration": 0,  # in s
-        "cost": 0,  # in s
-        "CO2": 0,  # in CO₂e
+        "duration": costs.get("time_cost", 0),  # in s
+        "cost": costs.get("total_cost", 0),  # in s
+        "CO2": costs.get("carbon_cost", 0),  # in CO₂e
+        "risk": costs.get("risk_cost", 0),  # in s
         }
 
     def haversine(self, lat1, lon1, lat2, lon2):
@@ -141,15 +142,15 @@ class CustomPathPlanner:
 
             for neighbor in self.G.neighbors(current):
                 edge_data = self.G[current][neighbor]
-                travel_time = self.get_travel_time(current, neighbor, edge_data, times[current])
-                tentative_g_score = g_score[current] + self.custom_cost(current, neighbor, path_of_type, mode_of_transport, edge_data, times[current])
+                costs = self.custom_cost(current, neighbor, path_of_type, mode_of_transport, edge_data, times[current])
+                tentative_g_score = g_score[current] + costs.get("total_cost", 0)
 
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score
                     heuristic_cost = self.heuristic(neighbor, dest)
                     f_score[neighbor] = tentative_g_score + heuristic_cost
-                    times[neighbor] = times[current] + timedelta(seconds=travel_time)
+                    times[neighbor] = times[current] + costs.get("time_cost", 0)
 
                     transport_mode = edge_data.get("type", "Truck")
                     mode_of_transport[neighbor] = transport_mode
@@ -159,7 +160,7 @@ class CustomPathPlanner:
                     else:
                         path_of_type[neighbor] = 0
 
-                    segCost[neighbor] = self.get_all_costs(current, neighbor, edge_data, times[current])
+                    segCost[neighbor] = self.get_all_costs(current, neighbor, edge_data, times[current], costs)
 
                     if neighbor not in open_set:
                         heapq.heappush(open_list, (f_score[neighbor], neighbor))

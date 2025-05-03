@@ -8,6 +8,8 @@ from cost_eval_model.construction_manager import ConstructionManager
 
 from scraping.scraper_api import get_construction_site_data
 
+from datetime import timedelta
+
 
 class CostAPI:
     
@@ -110,7 +112,7 @@ class CostAPI:
         return_dict = {
             "price_cost": price_cost,
             "carbon_cost": carbon_cost,
-            "time_cost": time_cost,
+            "time_cost": timedelta(time_cost),
             "risk_cost": risk_cost,
             "total_cost": cost
         }
