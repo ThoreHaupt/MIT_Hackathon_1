@@ -51,8 +51,8 @@ class CustomPathPlanner:
         data["time_next_edge_end"] = current_time 
 
         base_cost = data.get("length", 1)
-        self.cost_api.get_cost(data)
-        return base_cost
+        custom_costs = self.cost_api.get_cost(data)
+        return custom_costs.get("cost", base_cost)  # Default to base cost if not found
 
     def get_travel_time(self, u, v, data, current_time):
         return 1
@@ -81,6 +81,11 @@ class CustomPathPlanner:
         
     def calculate_path(self, orig, dest, settings):
         self.cost_api = CostAPI(settings["weight"], settings["size"])
+        self.cost_api.set_price_weight(settings["weight_money"])
+        self.cost_api.set_carbon_weight(settings["weight_co2"])
+        self.cost_api.set_travel_time_weight(settings["weight_time"])
+        self.cost_api.set_risk_weight(settings["weight_risk"])
+        
         if orig == dest:
             return []  # Edge case: origin is the same as destination
 
