@@ -1,5 +1,5 @@
-from Habors import Habor
-
+from .Habors import Habor
+import os
 
 # Shanghai 4393
 # Rotterdam 4023
@@ -32,11 +32,15 @@ def generate_filtered_pairs(set_a: dict[int, Habor], set_b: dict[int, Habor]) ->
     pairs = []
     for harbor_a in set_a.values():
         for harbor_b in set_b.values():
-            if harbor_a.id != harbor_b.id:  # Skip if IDs are equal
+            if harbor_a.id != harbor_b.id:
+                # Skip if IDs are equal
+                #print(harbor_b)
                 pairs.append((harbor_a, harbor_b))
     return pairs
 
 def get_all_routes_ship():
-    habors = read_harbors_from_file("world_harbors_with_ids.txt")
-    print(habors)
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    harbor_file = os.path.join(dir_path, "world_harbors_with_ids.txt")
+    habors = read_harbors_from_file(harbor_file)
+    # print(habors)
     return generate_filtered_pairs(habors, habors)
