@@ -4,17 +4,29 @@ import osmnx as ox
 import networkx as nx
 import pickle
 from pyrosm import OSM
+
+from planning.customPathPlanner import CustomPathPlanner
 #import pathPlanner
 #import customPathPlanner
 from scraping import scraper_api
+from multiprocessing import Pool
+import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
+
+
 
 class PathPlanning:
     def __init__(self):
         self.graph = None
         self.planner = None
 
-        self.loadRoadGraph("/media/nils/Nils_Data/MIT-Hackathon/road_graph_cleared.pkl")
+        self.loadRoadGraph("/media/nils/Nils_Data/MIT-Hackathon/road_graph_autobahn_cleared.pkl")
+        self.idxs = [n for n in self.graph]
+        self.roadTree = cKDTree([(self.graph.nodes[n]["x"],self.graph.nodes[n]["y"]) for n in self.graph])
+
         self.appendAirRoutes()
+
+        self.planner = CustomPathPlanner(self.graph)
 
     def loadRoadGraph(self, path):
         with open(path, "rb") as f:
@@ -24,13 +36,40 @@ class PathPlanning:
 
     def appendAirRoutes(self):
         airports = scraper_api.get_airports()
+
+        flights = scraper_api.get_flights()
+        matchedAirports = []
+        matchedNodes = []
+
         for key in airports:
             coordinates = airports[key]
-            node = ox.nearest_nodes(self.graph, coordinates[0], coordinates[1])
-            dist = math.dist(coordinates, (node["x"], node["y"]))
-            print(dist)
-            if dist > 100:
+            dist, idx = self.roadTree.query([coordinates[1], coordinates[0]])
+            if dist > 0.01:
                 continue
+            matchedAirports.append(key)
+            matchedNodes.append(self.idxs[idx])
+
+        for i, airport in enumerate(matchedAirports):
+            for j, airport2 in enumerate(matchedAirports):
+                outgoingFlights = flights[(flights['Dept Station'] == airport) & (flights['Arr Station'] == airport2)]
+                for row in outgoingFlights.itertuples():
+                    attrs = {
+                        "type": "air",
+                        "startTime": row["ETD (Zulu)"],
+                        "endTime": row["ETA (Zulu)"],
+                        "length": math.dist((self.graph.nodes[matchedNodes[i]]["x"],self.graph.nodes[matchedNodes[i]]["y"],
+                                            (self.graph.nodes[matchedNodes[j]]["x"],self.graph.nodes[matchedNodes[j]]["y"])))
+                    }
+                    self.graph.add_edge(matchedNodes[i], matchedNodes[j], **attrs)
+                    print("added flight ", attrs)
+
+    def plan(self, origin, destination):
+        start = ox.nearest_nodes(self.graph, origin[1], origin[0])
+        end  = ox.nearest_nodes(self.graph, destination[1], destination[0])
+
+        path = self.planner.calculate_path(start, end)
 
 
+
+        return path
 
