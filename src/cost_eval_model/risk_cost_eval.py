@@ -65,8 +65,8 @@ class RiskCostModel(CostModel):
             # Example of using the keras model for risk score calculation
             # input vector: ['Land', 'Strnum', 'Wotag', 'Stunde', 'Monat','inhab_plz', 'density', 'inhab_100']
             time_end: datetime.datetime = data['time_prior_edge_end']
-            wochentag = datetime.strftime("%A")
-            stunde = datetime.strftime("%H")
+            week_day = datetime.strftime("%A")
+            hour = datetime.strftime("%H")
             monat = datetime.strftime("%m")
 
             dat = super().get_plz_data(data['origin']['lat'], data['origin']['lng'])
@@ -74,10 +74,10 @@ class RiskCostModel(CostModel):
             density = dat['density']
             inhab_100 = dat['inhab_100']
 
-            straßennummer = 1  # Placeholder for actual street number calculation
+            street_id = 1  # Placeholder for actual street number calculation
 
             # input_data = np.array([[1, 8, 2, 8, 5, 12345, 0.5, 500000]])  # Example input
-            input_data = np.array([[wochentag, straßennummer, stunde, monat, inhab_plz, density, inhab_100]])
+            input_data = np.array([[week_day, street_id, hour, monat, inhab_plz, density, inhab_100]])
 
             # predict
             input_data_scaled = self.scaler.transform(input_data)

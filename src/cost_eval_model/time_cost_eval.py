@@ -21,8 +21,6 @@ class TimeCostModel(CostModel):
             if construction:
                 time_cost += construction["estimatedTimeLoss"]
 
-            time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
-
         if data['origin']['mode_prior_edge'] == data['destination']['mode_next_edge']:
             time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
         
