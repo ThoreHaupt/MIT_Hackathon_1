@@ -17,7 +17,7 @@ class CustomPathPlanner:
         return 1
 
     def get_all_costs(self,u,v,data,current_time):
-        return { "distance": self.haversine(self.G.nodes[u]['y'], self.G.nodes[u]['x'], self.G.nodes[v]['y'], self.G.nodes[v]['x']),  # in m
+        return { "distance": self.haversine(self.G.nodes[u]['x'], self.G.nodes[u]['y'], self.G.nodes[v]['x'], self.G.nodes[v]['y']),  # in m
         "duration": 0,  # in s
         "cost": 0,  # in s
         "CO2": 0,  # in CO₂e
@@ -34,8 +34,8 @@ class CustomPathPlanner:
 
     # Heuristic using haversine distance
     def heuristic(self, u, v):
-        u_point = (self.G.nodes[u]['y'], self.G.nodes[u]['x'])
-        v_point = (self.G.nodes[v]['y'], self.G.nodes[v]['x'])
+        u_point = (self.G.nodes[u]['x'], self.G.nodes[u]['y'])
+        v_point = (self.G.nodes[v]['x'], self.G.nodes[v]['y'])
         return self.haversine(*u_point, *v_point)
 
     def calculate_path(self, orig, dest):
@@ -63,7 +63,7 @@ class CustomPathPlanner:
                 while current in came_from:
 
                     segment = { "type": mode_of_transport[last], # in {"Truck", "Train", "Ship", "Plane"}
-                                "path": [[self.G.nodes[current]['y'], self.G.nodes[current]['x']], [self.G.nodes[last]['y'], self.G.nodes[last]['x']]], # Coordinates of start and destination
+                                "path": [[self.G.nodes[current]['x'], self.G.nodes[current]['y']], [self.G.nodes[last]['x'], self.G.nodes[last]['y']]], # Coordinates of start and destination
                                 "distance": segCost[last]["distance"], # in m
                                 "duration": segCost[last]["duration"], # in s
                                 "cost": segCost[last]["cost"], # in s

@@ -55,16 +55,12 @@ class PathPlanning:
                                             (self.graph.nodes[matchedNodes[j]]["x"],self.graph.nodes[matchedNodes[j]]["y"])))
                     }
                     self.graph.add_edge(matchedNodes[i], matchedNodes[j], **attrs)
-                    print("added flight ", attrs)
 
     def plan(self, origin, destination):
-        print(origin, destination)
 
         start = ox.nearest_nodes(self.graph, origin[1], origin[0])
         end  = ox.nearest_nodes(self.graph, destination[1], destination[0])
 
-        print(f"start: {start}, end: {end}")
-        print(f"{self.graph.nodes[start]} -> {self.graph.nodes[end]}")
         path = self.planner.calculate_path(start, end)
 
 

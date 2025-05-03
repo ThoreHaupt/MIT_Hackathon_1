@@ -25,8 +25,8 @@ class PathPlanner:
 
     # Heuristic using haversine distance
     def heuristic(self, u, v):
-        u_point = (self.graph.nodes[u]['y'], self.graph.nodes[u]['x'])
-        v_point = (self.graph.nodes[v]['y'], self.graph.nodes[v]['x'])
+        u_point = (self.graph.nodes[u]['x'], self.graph.nodes[u]['y'])
+        v_point = (self.graph.nodes[v]['x'], self.graph.nodes[v]['y'])
         return self.haversine(*u_point, *v_point)
 
     def calculate_path(self, orig, dest):
