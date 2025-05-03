@@ -16,4 +16,6 @@ class PriceCostModel(CostModel):
         :return: The cost of the model.
         """
         # Implement the evaluation logic here
+
+        
         pass

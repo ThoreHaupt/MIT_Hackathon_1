@@ -5,16 +5,32 @@ class TimeCostModel(CostModel):
     def __init__(self, time_cost):
         self.time_cost = time_cost
 
-    def evaluate(self, data):
+    def evaluate(self, data, construction_manager, transport_time_api):
 
         """
         Calculate the time per km for each transport type.
         """
-        cost_dict = {
-            "train": 1 / self.,
-            "ship": 1 / self.,
-            "road": 1 / self.,
-            "air": 1 / self.
-        }
+        
+        # in case of truck,truck and truck is on highway we need to check if there is a construction site
+        # current_time = data["time_prior_edge_end"]
+        time_cost = 0
 
-        return cost_dict[transport_type] * distance
+        if data['origin']['mode_prior_edge'] == 'truck' and data['destination']['mode_next_edge'] == 'truck' and data['highway'] in ['motorway', 'trunk']:
+            construction = construction_manager.get_construction(data['origin']['lat'], data['origin']['lng'])
+            if construction:
+                time_cost += construction["estimatedTimeLoss"]
+
+            time_cost += self.time_cost["truck"] * data['distance_next_edge'] / data['max_speed_next_edge']
+
+        if data['origin']['mode_prior_edge'] == data['destination']['mode_next_edge']:
+            time_cost += data['distance_next_edge'] / data['max_speed_next_edge']
+        
+        # calculate the time if we have to switch 
+        if data['origin']['mode_prior_edge'] != data['destination']['mode_next_edge']:
+            # fetch wait time from 
+            #next_leave_time = transport_time_api.get_next_departure_time(data['origin']['lat'], data['origin']['lng'], data['destination']['lat'], data['destination']['lng'], data['origin']['mode_prior_edge'], data['destination']['mode_next_edge'])
+            #wait_time = next_leave_time - current_time
+            wait_time = 3
+            time_cost += wait_time
+
+        return time_cost
